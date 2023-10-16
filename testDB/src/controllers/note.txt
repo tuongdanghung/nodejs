@@ -1,0 +1,2 @@
+nhận request đưa qua services
+sau khi hoàn thành xong đưa lại cho client

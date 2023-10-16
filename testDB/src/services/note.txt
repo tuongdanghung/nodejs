@@ -1,0 +1,4 @@
+nhận dữ liệu từ controler đưa qua services xử lí
+xử lý logic check trường hợp
+services sẽ tương tác với repositories để xử lý
+xử lý xong trả lại conttroller
