@@ -29,22 +29,11 @@ export const getOneProductSize = async (req, res) => {
     }
 };
 
-// export const updateRole = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const response = await services.updateRole(id, req.body);
-//         return res.status(200).json(response);
-//     } catch (error) {
-//         return internalServerError(res);
-//     }
-// };
-
-// export const deleteRole = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const response = await services.deleteRole({ id });
-//         return res.status(200).json(response);
-//     } catch (error) {
-//         return internalServerError(res);
-//     }
-// };
+export const updateProductSize = async (req, res) => {
+    try {
+        const response = await services.updateProductSize(req.body);
+        return res.status(200).json(response);
+    } catch (error) {
+        return internalServerError(res);
+    }
+};

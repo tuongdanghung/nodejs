@@ -29,7 +29,6 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../store";
 import Category from "./chillModalUpdate/Category";
 import Color from "./chillModalUpdate/Color";
-import Ram from "./chillModalUpdate/Ram";
 import Capacity from "./chillModalUpdate/Capacity";
 import Blog from "./chillModalUpdate/Blog";
 const DialogComponent: React.FC<ModalCreate> = (props) => {
@@ -98,7 +97,7 @@ const DialogComponent: React.FC<ModalCreate> = (props) => {
                 color: title,
                 id: id,
                 token,
-            })
+            });
             if (title !== "") {
                 const response = await apiEditColor({
                     color: title,
@@ -184,17 +183,6 @@ const DialogComponent: React.FC<ModalCreate> = (props) => {
                             value={title}
                             valid={checkValid.title}
                             keywords="Color"
-                            setShow={setCheckValid}
-                        />
-                    </div>
-                )}
-                {slug === "manager-ram" && (
-                    <div>
-                        <Ram id={id} handleChange={handleChange} />
-                        <Required
-                            value={title}
-                            valid={checkValid.title}
-                            keywords="Ram"
                             setShow={setCheckValid}
                         />
                     </div>

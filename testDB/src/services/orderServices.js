@@ -7,27 +7,22 @@ import {
 export const createOrder = async (id, body) => {
     try {
         const dataOrderItem = await getAllOrderItemRepository();
-        const dataOrder = await getAllOrderRepository();
-        const codeOrders = new Set();
-
-        for (const item of dataOrderItem) {
-            if (!codeOrders.has(item.codeOrder)) {
-                const createOrder = {
-                    orderItemId: item.codeOrder,
-                    addressId: +body.addressId,
-                    paymentId: +body.paymentId,
-                    userId: id,
-                };
-                const response = await createOrderRepository(createOrder);
-                return {
-                    success: response > 0 ? true : false,
-                    message:
-                        response > 0
-                            ? "Create order successfully"
-                            : "Create order failed",
-                };
-            }
+        const uniqueCodeOrders = [
+            ...new Set(dataOrderItem.map((item) => item.codeOrder)),
+        ];
+        for (const item of uniqueCodeOrders) {
+            const createOrder = {
+                orderItemId: item,
+                addressId: +body.addressId,
+                paymentId: +body.paymentId,
+                userId: id,
+            };
+            await createOrderRepository(createOrder);
         }
+        return {
+            success: true,
+            message: "Create order successfully",
+        };
     } catch (error) {
         return error;
     }

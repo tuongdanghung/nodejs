@@ -25,36 +25,36 @@ export const getAllProductSizeRepository = async () => {
         attributes: {
             exclude: ["createdAt", "updatedAt"],
         },
-        include: [
-            {
-                model: db.Product,
-                as: "product",
-                attributes: {
-                    exclude: ["createdAt", "updatedAt"],
-                },
-            },
-            {
-                model: db.Capacity,
-                as: "capacity",
-                attributes: {
-                    exclude: ["createdAt", "updatedAt"],
-                },
-            },
-            {
-                model: db.Color,
-                as: "color",
-                attributes: {
-                    exclude: ["createdAt", "updatedAt"],
-                },
-            },
-        ],
+        // include: [
+        //     {
+        //         model: db.Product,
+        //         as: "product",
+        //         attributes: {
+        //             exclude: ["createdAt", "updatedAt"],
+        //         },
+        //     },
+        //     {
+        //         model: db.Capacity,
+        //         as: "capacity",
+        //         attributes: {
+        //             exclude: ["createdAt", "updatedAt"],
+        //         },
+        //     },
+        //     {
+        //         model: db.Color,
+        //         as: "color",
+        //         attributes: {
+        //             exclude: ["createdAt", "updatedAt"],
+        //         },
+        //     },
+        // ],
     });
     return data;
 };
 
-export const getOneProductSizeRepository = async ({ id }) => {
+export const getOneProductSizeRepository = async (body) => {
     const data = await db.ProductSize.findOne({
-        where: { id },
+        where: { id: body },
         attributes: {
             exclude: ["createdAt", "updatedAt"],
         },
@@ -82,15 +82,23 @@ export const getOneProductSizeRepository = async ({ id }) => {
             },
         ],
     });
+
     return data;
 };
 
-export const updateProductSizeRepository = async (brandId, body) => {
-    const data = await db.Brand.update(body, {
-        where: {
-            id: brandId,
+export const updateProductSizeRepository = async (body) => {
+    const data = await db.ProductSize.update(
+        {
+            productId: body.productId,
+            capacityId: body.capacityId,
+            colorId: body.colorId,
         },
-    });
+        {
+            where: {
+                id: body.id,
+            },
+        }
+    );
     return data;
 };
 

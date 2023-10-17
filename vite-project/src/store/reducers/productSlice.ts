@@ -9,7 +9,7 @@ export const appSlice = createSlice({
         brand: [],
         category: [],
         capacity: [],
-        ram: [],
+        productSize: [],
         color: [],
         isLoading: false,
     },
@@ -39,11 +39,6 @@ export const appSlice = createSlice({
             state.category = action.payload;
         });
 
-        builder.addCase(actions.GetRam.fulfilled, (state, action) => {
-            state.isLoading = false;
-            state.ram = action.payload;
-        });
-
         builder.addCase(actions.GetCapacity.fulfilled, (state, action) => {
             state.isLoading = false;
             state.capacity = action.payload;
@@ -53,10 +48,16 @@ export const appSlice = createSlice({
             state.isLoading = false;
             state.color = action.payload;
         });
+        builder.addCase(actions.GetAllProductSize.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.productSize = action.payload
+        });
 
         builder.addCase(actions.GetAllProduct.rejected, (state) => {
             state.isLoading = false;
         });
+
+        
     },
 });
 

@@ -13,6 +13,7 @@ export const createOrderRepository = async (body) => {
             userId: body.userId,
         },
     });
+    console.log(data);
     return data;
 };
 

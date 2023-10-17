@@ -7,7 +7,7 @@ export interface Modal {
     category: object[];
     image?: object[];
     ram: any;
+    filterProductSize: object[];
     handleOpen: (id: string) => void;
     handleClose: (open: boolean) => void;
-    handleEdit: (data: object) => void;
 }

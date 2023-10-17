@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Collapse, Button } from "@material-tailwind/react";
 import { TextInput } from "flowbite-react";
 import { BiSearch } from "react-icons/bi";
-import {
-    GetAllProduct,
-    GetBrand,
-    GetColor,
-    GetRam,
-} from "../../../../store/actions";
+import { GetAllProduct, GetBrand, GetColor } from "../../../../store/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../../store";
 
@@ -62,7 +57,6 @@ const FilterProduct = () => {
     useEffect(() => {
         dispatch(GetBrand(null));
         dispatch(GetColor(null));
-        dispatch(GetRam(null));
     }, []);
     useEffect(() => {
         dispatch(GetAllProduct(isParams));

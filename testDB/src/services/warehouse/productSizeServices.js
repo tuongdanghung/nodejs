@@ -4,7 +4,6 @@ import {
     getAllProductSizeRepository,
     getOneProductSizeRepository,
     updateProductSizeRepository,
-    deleteProductSizeRepository,
 } from "../../repositories/warehouse/productSizeRepository";
 export const createProductSize = async (body) => {
     try {
@@ -51,12 +50,6 @@ export const createProductSize = async (body) => {
 export const getAllProductSize = async () => {
     try {
         const response = await getAllProductSizeRepository();
-        // const data = {
-        //     a: body.productId,
-        //     a: capacity,
-        //     a: color,
-        // };
-        // console.log(data);
         return {
             success: true,
             data: response,
@@ -72,6 +65,48 @@ export const getOneProductSize = async ({ id }) => {
         return {
             success: true,
             data: response,
+        };
+    } catch (error) {
+        return error;
+    }
+};
+
+export const updateProductSize = async (body) => {
+    try {
+        const items = [];
+        for (const capacity of body.capacityId) {
+            for (const color of body.colorId) {
+                for (const productId of body.productSizeId) {
+                    const item = {
+                        id: productId, // Thêm trường id từ mảng productIds
+                        productId: body.productId,
+                        capacityId: capacity,
+                        colorId: color,
+                    };
+                    items.push(item); // Thêm mỗi item vào mảng items
+                }
+            }
+        }
+        const uniqueObjects = [];
+
+        items.forEach((obj) => {
+            if (
+                !uniqueObjects.some(
+                    (uniqueObj) =>
+                        uniqueObj.productId === obj.productId &&
+                        uniqueObj.capacityId === obj.capacityId &&
+                        uniqueObj.colorId === obj.colorId
+                )
+            ) {
+                uniqueObjects.push(obj);
+            }
+        });
+        for (const item of uniqueObjects) {
+            await updateProductSizeRepository(item);
+        }
+        return {
+            success: true,
+            message: `Updated product successfully`,
         };
     } catch (error) {
         return error;

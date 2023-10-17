@@ -34,6 +34,15 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
     const handleClose = () => {
         props.handleClose(false);
     };
+
+    let totalPrice = 0;
+
+    detail?.map((item: any) => {
+        const priceProduct =
+            item.productSize.product.price * item.productSize.capacity.percent;
+        totalPrice += priceProduct;
+    });
+
     return (
         <Dialog
             className="modal-dialog"
@@ -76,7 +85,7 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                                     item.productSize.product.price *
                                     item.productSize.capacity.percent;
                                 return (
-                                    <tr key={item._id}>
+                                    <tr key={item.id}>
                                         <td className={classes}>
                                             <Typography
                                                 variant="small"
@@ -163,6 +172,9 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                         </tbody>
                     </table>
                 </Card>
+                <p className="p-4 text-right">
+                    SubTotal: {totalPrice.toLocaleString("en-US")} $
+                </p>
             </DialogBody>
             <DialogFooter>
                 <Button

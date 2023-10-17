@@ -1,4 +1,3 @@
-import db from "../../models";
 import {
     createProductRepository,
     getAllProductRepository,
@@ -6,13 +5,14 @@ import {
     updateProductRepository,
     deleteProductRepository,
 } from "../../repositories/warehouse/productRepository";
-export const createProduct = async ({
-    title,
-    description,
-    brandId,
-    categoryId,
-    price,
-}) => {
+import { createImageRepository } from "../../repositories/warehouse/imageRepository";
+import { createProductSizeRepository } from "../../repositories/warehouse/productSizeRepository";
+export const createProduct = async (
+    { title, description, brandId, categoryId, price, stock },
+    image,
+    colorId,
+    capacityId
+) => {
     try {
         const response = await createProductRepository({
             title,
@@ -20,7 +20,38 @@ export const createProduct = async ({
             brandId,
             categoryId,
             price,
+            stock,
         });
+        for (const item of image) {
+            const createImage = {
+                productId: response[0].dataValues.id,
+                src: item.src,
+            };
+            await createImageRepository(createImage);
+        }
+        let hasSuccess = false;
+        for (const capacity of capacityId) {
+            for (const color of colorId) {
+                const item = {
+                    productId: response[0].dataValues.id,
+                    capacityId: capacity,
+                    colorId: color,
+                };
+                try {
+                    const response = await createProductSizeRepository({
+                        productId: item.productId,
+                        capacityId: item.capacityId,
+                        colorId: item.colorId,
+                    });
+                    const success = response[1] === true ? true : false;
+                    if (success) {
+                        hasSuccess = true;
+                    }
+                } catch (error) {
+                    throw error;
+                }
+            }
+        }
         return {
             success: response[1] === true ? true : false,
             message:
@@ -68,6 +99,7 @@ export const getAllProduct = async () => {
             data: products,
         };
     } catch (error) {
+        console.log(error);
         return error;
     }
 };
@@ -113,7 +145,6 @@ export const updateProduct = async (productId, body) => {
                     : `Updated product failed`,
         };
     } catch (error) {
-        console.log(error);
         return error;
     }
 };

@@ -11,7 +11,6 @@ import { CheckValidInterface, ModalCreate } from "../../../../interface/client";
 import {
     GetBrand,
     GetCategory,
-    GetRam,
     GetCapacity,
     GetColor,
     GetAllProduct,
@@ -44,17 +43,14 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
     const dispatch = useDispatch<AppDispatch>();
     const [watch, setWatch] = useState<any>("listen");
     const brand = useSelector((state: any) => state?.productReducer.brand);
-    const ram = useSelector((state: any) => state?.productReducer.ram);
     const color = useSelector((state: any) => state?.productReducer.color);
     const [file, setFile] = useState<any>([]);
     const [image, setImage] = useState<any>([]);
-    const [itemValueRam, setItemValueRam] = useState<any>([]);
     const [itemValueColor, setItemValueColor] = useState<any>([]);
     const [itemValueCapacity, setItemValueCapacity] = useState<any>([]);
     const [title, setTitle] = useState<string>("");
     const [price, setPrice] = useState<number>(0);
     const [quantity, setQuantity] = useState<number>(0);
-    const [seller, setSeller] = useState<number>(1);
     const [description, setDescription] = useState<string>("");
     const [itemValueBrand, setItemValueBrand] = useState<any>("");
     const [itemValueCategory, setItemValueCategory] = useState<any>("");
@@ -66,7 +62,6 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
         brand: false,
         blog: false,
         image: false,
-        ram: false,
         capacity: false,
         color: false,
         description: false,
@@ -93,7 +88,6 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
     useEffect(() => {
         setOpen(props.open);
         setSlug(props.slug);
-        dispatch(GetRam(null));
         dispatch(GetCapacity(null));
         dispatch(GetColor(null));
         dispatch(GetBrand(null));
@@ -109,19 +103,6 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
         setImage(event.target.files);
         toBase64(event.target.files);
     };
-
-    const handleCheckboxRamChange = (id: any) => {
-        const updatedCheckBoxSizes = [...itemValueRam];
-        const sizeIndex = updatedCheckBoxSizes.findIndex(
-            (selectItem) => selectItem.id === id
-        );
-        if (sizeIndex !== -1) {
-            updatedCheckBoxSizes.splice(sizeIndex, 1); // Loại bỏ nếu đã tồn tại
-        } else {
-            updatedCheckBoxSizes.push({ id: id }); // Thêm nếu chưa tồn tại
-        }
-        setItemValueRam(updatedCheckBoxSizes);
-    };
     const handleCheckboxColorChange = (id: any) => {
         const updatedCheckBoxColor = [...itemValueColor];
         const colorIndex = updatedCheckBoxColor.findIndex(
@@ -130,7 +111,7 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
         if (colorIndex !== -1) {
             updatedCheckBoxColor.splice(colorIndex, 1);
         } else {
-            updatedCheckBoxColor.push({ id: id });
+            updatedCheckBoxColor.push(id);
         }
         setItemValueColor(updatedCheckBoxColor);
     };
@@ -142,7 +123,7 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
         if (sizeIndex !== -1) {
             updatedCheckBoxSizes.splice(sizeIndex, 1);
         } else {
-            updatedCheckBoxSizes.push({ id: id });
+            updatedCheckBoxSizes.push(id);
         }
         setItemValueCapacity(updatedCheckBoxSizes);
     };
@@ -152,10 +133,10 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
         setQuantity(0);
         setDescription("");
         setImage([]);
-        setItemValueBrand([]);
+        setItemValueBrand("");
+        setItemValueCategory("");
         setItemValueCapacity([]);
         setItemValueColor([]);
-        setSeller(1);
     };
     const handleCreate = async () => {
         if (slug === "manager-product") {
@@ -207,12 +188,6 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
                     color: true,
                 }));
             }
-            if (itemValueRam.length === 0) {
-                setCheckValid((prevState) => ({
-                    ...prevState,
-                    ram: true,
-                }));
-            }
             if (itemValueCapacity.length === 0) {
                 setCheckValid((prevState) => ({
                     ...prevState,
@@ -224,19 +199,15 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
                 price,
                 description,
                 image,
-                seller,
-                brand: itemValueBrand,
-                category: itemValueCategory,
-                quantity,
-                ram: JSON.stringify(itemValueRam),
+                brand: +itemValueBrand,
+                category: +itemValueCategory,
+                stock: quantity,
                 capacity: JSON.stringify(itemValueCapacity),
                 color: JSON.stringify(itemValueColor),
             };
-            console.log(payload);
             const formData = new FormData();
             for (let i of Object.entries(payload)) formData.append(i[0], i[1]);
             for (let img of image) formData.append("image", img);
-            console.log(formData);
             if (
                 title !== "" &&
                 price !== 0 &&
@@ -344,9 +315,9 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
                     setIsSnipper(false);
                     setValue("");
                     dispatch(GetCapacity(null));
-                    toast.success("Create ram successfully");
+                    toast.success("Create capacity successfully");
                 } else {
-                    toast.error("Create ram failed");
+                    toast.error("Create capacity failed");
                 }
                 props.handleClose(false);
             }
@@ -445,7 +416,7 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
                             </div>
                             <div>
                                 <div>
-                                    <label className="block">Quantity</label>
+                                    <label className="block">Stock</label>
                                     <input
                                         className="border border-collapse rounded-lg w-full"
                                         type="number"
@@ -458,23 +429,6 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
                                         value={quantity}
                                         valid={checkValid.quantity}
                                         keywords="Quantity"
-                                        setShow={setCheckValid}
-                                    />
-                                </div>
-                                <div className="mt-4">
-                                    <label className="block">Seller</label>
-                                    <input
-                                        className="border border-collapse rounded-lg w-full"
-                                        type="number"
-                                        value={seller}
-                                        onChange={(e) =>
-                                            setSeller(Number(e.target.value))
-                                        }
-                                    />
-                                    <Required
-                                        value={seller}
-                                        valid={checkValid.seller}
-                                        keywords="Seller"
                                         setShow={setCheckValid}
                                     />
                                 </div>
@@ -561,38 +515,6 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
                                 value={itemValueColor}
                                 valid={checkValid.color}
                                 keywords="Color"
-                                setShow={setCheckValid}
-                            />
-                        </div>
-                        <div className=" rounded-lg border border-separate mt-5 p-4">
-                            <label>Ram</label>
-                            <div className="grid grid-cols-5 gap-5">
-                                {ram?.map((item: any, index: any) => {
-                                    return (
-                                        <div
-                                            key={index}
-                                            className="flex items-center checked-button"
-                                        >
-                                            <label className="label-css">
-                                                {item.size} GB
-                                            </label>
-                                            <Checkbox
-                                                value={item.id}
-                                                onChange={() =>
-                                                    handleCheckboxRamChange(
-                                                        item.id
-                                                    )
-                                                }
-                                                crossOrigin={undefined}
-                                            />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                            <Required
-                                value={itemValueRam}
-                                valid={checkValid.ram}
-                                keywords="Ram"
                                 setShow={setCheckValid}
                             />
                         </div>
@@ -687,17 +609,6 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
                         <Required
                             value={category}
                             valid={checkValid.category}
-                            keywords="Title"
-                            setShow={setCheckValid}
-                        />
-                    </div>
-                )}
-                {slug === "manager-ram" && (
-                    <div>
-                        <Color handleData={handleData} />
-                        <Required
-                            value={ram}
-                            valid={checkValid.ram}
                             keywords="Title"
                             setShow={setCheckValid}
                         />

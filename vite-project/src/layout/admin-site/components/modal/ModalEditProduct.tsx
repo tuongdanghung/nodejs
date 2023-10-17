@@ -10,6 +10,7 @@ import { Modal } from "../../../../interface/client";
 import CheckBoxComponent from "../checkbox";
 import "./index.scss";
 import CheckBoxImage from "../checkBoxImage";
+import { apiEditProduct, apiUpdateProductSize } from "../../../../apis";
 const ModalEditProduct: React.FC<Modal> = (props) => {
     const [open, setOpen] = useState<boolean>(false);
     const [item, setItem] = useState<any>(props.item);
@@ -17,42 +18,38 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
     const [itemSelect, setItemSelect] = useState<any>({});
     const [itemCheckBox, setItemCheckBox] = useState<any>({});
     const [capacity, setCapacity] = useState<object[]>(props.capacity);
-    const [ram, setRam] = useState<object[]>(props.ram);
     const [brand, setBrand] = useState<object[]>(props.brand);
     const [color, setColor] = useState<object[]>(props.color);
     const [category, setCategory] = useState<object[]>(props.category);
-    const [valueRam, setValueRam] = useState<object[]>(item.ram);
     const [valueCapacity, setValueCapacity] = useState<object[]>([]);
     const [valueColor, setValueColor] = useState<object[]>([]);
     const [itemImage, setItemImage] = useState<any>([]);
     const [itemDescription, setDescription] = useState<any>("");
     const [valueImageFile, setValueImageFile] = useState<any>([]);
     const [valueImageCloud, setValueCloud] = useState<object>([]);
-
+    const [filterProductSize, setFilterProductSize] = useState<object>([]);
     useEffect(() => {
         setOpen(props.open);
         setItem(props.item);
         setDescription(item.description);
+        setFilterProductSize(props.filterProductSize);
         setItemInput({
-            price: item.price,
             title: item.title,
-            quantity: item.quantity,
-            seller: item.seller,
+            price: item.price,
+            Stock: item.stock,
         });
         setItemSelect({
-            category: item.category,
-            brand: item.brand,
+            category: item?.category?.id,
+            brand: item?.brand?.id,
         });
 
         setItemCheckBox({
-            color: item.color,
-            ram: item.ram,
-            capacity: item.capacity,
+            color: item?.productSize?.color,
+            capacity: item?.productSize?.capacity,
         });
         setItemImage(item.image);
         setBrand(props.brand);
         setCategory(props.category);
-        setRam(props.ram);
         setCapacity(props.capacity);
         setColor(props.color);
     }, [props]);
@@ -61,11 +58,11 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
         if (name === "category") {
             setItemSelect((prevData: any) => ({
                 ...prevData,
-                category: value,
+                category: +value,
             }));
         }
         if (name === "brand") {
-            setItemSelect((prevData: any) => ({ ...prevData, brand: value }));
+            setItemSelect((prevData: any) => ({ ...prevData, brand: +value }));
         }
     };
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,28 +73,36 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
     const handleClose = () => {
         props.handleClose(false);
     };
-    const changeValueRam = (data: any) => {
-        setValueRam(data);
-    };
     const changeValueCapacity = (data: any) => {
         setValueCapacity(data);
     };
     const changeValueColor = (data: any) => {
         setValueColor(data);
     };
-    const handleEdit = () => {
-        props.handleEdit({
+    const handleEdit = async () => {
+        const payload = {
             ...itemInput,
-            ...itemSelect,
-            open: false,
-            id: item._id,
-            ram: valueRam,
+            brandId: itemSelect.brand,
+            categoryId: itemSelect.category,
+            id: item.id,
             description: itemDescription,
-            capacity: valueCapacity,
-            color: valueColor,
-            imageFile: valueImageFile,
-            imageCloud: valueImageCloud,
-        });
+        };
+
+        if (Array.isArray(filterProductSize)) {
+            const newDataProductSize = filterProductSize.map((item: any) =>
+                typeof item === "object" ? item.id : item
+            );
+            const updateProductSize = {
+                capacityId: valueCapacity,
+                colorId: valueColor,
+                productSizeId: newDataProductSize,
+                productId: item.id,
+            };
+            const response = await apiUpdateProductSize(updateProductSize);
+            console.log("<<<<<<", response);
+        }
+        const response = await apiEditProduct(payload, item.id);
+        console.log(">>>>>", response);
     };
     const renderInputs = () => {
         return Object.keys(itemInput).map((key: any, index: any) => (
@@ -128,11 +133,13 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
                         name={key}
                         onChange={handleSelectChange}
                     >
-                        {brand?.map((brandItem: any) => (
-                            <option key={brandItem.id} value={brandItem.title}>
-                                {brandItem.title}
-                            </option>
-                        ))}
+                        {brand?.map((brandItem: any) => {
+                            return (
+                                <option key={brandItem.id} value={brandItem.id}>
+                                    {brandItem.title}
+                                </option>
+                            );
+                        })}
                     </select>
                 ) : (
                     <select
@@ -144,7 +151,7 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
                         {category?.map((categoryItem: any) => (
                             <option
                                 key={categoryItem.id}
-                                value={categoryItem.title}
+                                value={categoryItem.id}
                             >
                                 {categoryItem.title}
                             </option>
@@ -164,6 +171,7 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
             }
         }
     };
+
     return (
         <div>
             <Dialog
@@ -184,11 +192,9 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
                     <div>
                         <CheckBoxComponent
                             item={item}
-                            ram={ram}
                             color={color}
                             capacity={capacity}
                             itemCheckBox={itemCheckBox}
-                            changeValueRam={changeValueRam}
                             changeValueCapacity={changeValueCapacity}
                             changeValueColor={changeValueColor}
                         />

@@ -14,30 +14,21 @@ import {
     GetProductDetail,
     GetBrand,
     GetCategory,
-    GetRam,
     GetCapacity,
     GetColor,
+    GetAllProductSize,
 } from "../../../../store/actions";
-import { apiDeleteProduct, apiEditProduct } from "../../../../apis";
+import { apiDeleteProduct } from "../../../../apis";
 import { AppDispatch } from "../../../../store";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import ModalEditProduct from "../../components/modal/ModalEditProduct";
 import Snipper from "../../components/snipper";
 
-const TABLE_HEAD = [
-    "Title",
-    "Price",
-    "Quantity",
-    "Seller",
-    "Category",
-    "Brand",
-    "Total Rating",
-    "Image",
-    "",
-];
+const TABLE_HEAD = ["Title", "Price", "Stock", "Category", "Brand", ""];
 const ManagerProduct = () => {
     const [open, setOpen] = useState<boolean>(false);
+    const [filterProductSize, setFilterProductSize] = useState<any>([]);
     const dispatch = useDispatch<AppDispatch>();
     const [data, setData] = useState<any>([]);
     const product = useSelector(
@@ -47,6 +38,10 @@ const ManagerProduct = () => {
     const brand = useSelector((state: any) => state?.productReducer.brand);
     const ram = useSelector((state: any) => state?.productReducer.ram);
     const color = useSelector((state: any) => state?.productReducer.color);
+    const productSize = useSelector(
+        (state: any) => state?.productReducer.productSize
+    );
+
     const [isSnipper, setIsSnipper] = useState(false);
     const capacity = useSelector(
         (state: any) => state?.productReducer.capacity
@@ -54,13 +49,14 @@ const ManagerProduct = () => {
     const category = useSelector(
         (state: any) => state?.productReducer.category
     );
+
     const token = localStorage.getItem("auth");
 
     useEffect(() => {
         dispatch(GetAllProduct(null));
-        dispatch(GetRam(null));
         dispatch(GetCapacity(null));
         dispatch(GetColor(null));
+        dispatch(GetAllProductSize(null));
     }, [item]);
 
     const handleDelete = async (id: string) => {
@@ -76,6 +72,11 @@ const ManagerProduct = () => {
 
     const handleOpen = (id: string) => {
         const detail = { id: id, token: token };
+        setFilterProductSize(
+            productSize?.filter(function (item: any) {
+                return item.productId === id;
+            })
+        );
         dispatch(GetProductDetail(detail));
         dispatch(GetBrand(null));
         dispatch(GetCategory(null));
@@ -84,35 +85,10 @@ const ManagerProduct = () => {
     const handleClose = (close: boolean) => {
         setOpen(close);
     };
-    const handleEdit = async (data: any) => {
-        const payload = {
-            ...data,
-            id: item._id,
-            ram: JSON.stringify(data.ram),
-            capacity: JSON.stringify(data.capacity),
-            color: JSON.stringify(data.color),
-            imageCloud: JSON.stringify(data.imageCloud),
-        };
-        const formData = new FormData();
-        for (let i of Object.entries(payload))
-            formData.append(i[0], i[1] as string | Blob);
-        for (let x of data.imageFile) formData.append("image", x);
-        setOpen(data.open);
-        setIsSnipper(true);
-        const response = await apiEditProduct(formData, item._id);
-        if (response.data.success) {
-            setIsSnipper(false);
-            dispatch(GetAllProduct(null));
-            toast.success("Updated product successfully");
-        } else {
-            toast.error("Updated product failed");
-        }
-    };
 
     const handlePage = (pagination: any) => {
         setData(pagination);
     };
-
     return (
         <Card className="h-full w-full">
             {isSnipper ? <Snipper /> : null}
@@ -136,18 +112,6 @@ const ManagerProduct = () => {
                     <tbody>
                         {data?.map((item: any, index: any) => {
                             const isLast = index === product.length - 1;
-                            const price: number = item.price;
-                            const quantity: number = item?.quantity;
-                            const seller: number = item?.seller;
-                            const formattedPrice: string = price
-                                .toLocaleString("en-US")
-                                .replace(/,/g, ".");
-                            // const formattedQuantity: string = quantity
-                            //     .toLocaleString("en-US")
-                            //     .replace(/,/g, ".");
-                            const formattedSeller: string = seller
-                                .toLocaleString("en-US")
-                                .replace(/,/g, ".");
                             const classes = isLast
                                 ? "p-4"
                                 : "p-4 border-b border-blue-gray-50";
@@ -159,33 +123,16 @@ const ManagerProduct = () => {
                                         </div>
                                     </td>
                                     <td className={classes}>
-                                        {formattedPrice} $
+                                        {item.price.toLocaleString("en-US")} $
                                     </td>
                                     <td className={classes}>
-                                        {/* {formattedQuantity} $ */}
-                                        quantity
+                                        {item.stock.toLocaleString("en-US")}
                                     </td>
                                     <td className={classes}>
-                                        {formattedSeller} %
+                                        {item.category.title}
                                     </td>
                                     <td className={classes}>
-                                        {item.category_code.title}
-                                    </td>
-                                    <td className={classes}>
-                                        {item.brand_code.title}
-                                    </td>
-                                    <td className={classes}>
-                                        {item.totalRating}
-                                    </td>
-                                    <td className={classes}>
-                                        <img
-                                            style={{
-                                                width: "100px",
-                                                margin: "auto",
-                                            }}
-                                            src={item.image[0]?.image}
-                                            alt=""
-                                        />
+                                        {item.brand.title}
                                     </td>
                                     <td className={`${classes}`}>
                                         <Button
@@ -196,7 +143,6 @@ const ManagerProduct = () => {
                                         >
                                             <AiFillDelete className="h-5 w-6 text-lg text-white" />
                                         </Button>
-
                                         <Button
                                             onClick={() => handleOpen(item.id)}
                                             className="bg-green-500 hover:bg-green-700 text-white font-bold px-6 py-3 rounded text-lg"
@@ -217,12 +163,12 @@ const ManagerProduct = () => {
                 open={open}
                 item={item}
                 brand={brand}
+                filterProductSize={filterProductSize}
                 ram={ram}
                 color={color}
                 capacity={capacity}
                 category={category}
                 handleOpen={handleOpen}
-                handleEdit={handleEdit}
                 handleClose={handleClose}
             />
             <ToastContainer />

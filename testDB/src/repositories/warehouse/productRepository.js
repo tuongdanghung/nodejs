@@ -6,6 +6,7 @@ export const createProductRepository = async ({
     brandId,
     categoryId,
     price,
+    stock,
 }) => {
     const data = await db.Product.findOrCreate({
         where: { title },
@@ -15,6 +16,7 @@ export const createProductRepository = async ({
             brandId,
             categoryId,
             price,
+            stock,
         },
     });
     return data;

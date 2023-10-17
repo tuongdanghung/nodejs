@@ -101,3 +101,17 @@ export const apiEditColor = (data: any) =>
         headers: { Authorization: `Bearer ${token}` },
     });
 // color
+
+export const apiUpdateProductSize = (data: any) =>
+    axios({
+        url: "/productSize",
+        method: "PUT",
+        data: data,
+        headers: { Authorization: `Bearer ${token}` },
+    });
+export const getAllProductSize = (data:any) =>
+    axios({
+        url: "/productSize",
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+    });
