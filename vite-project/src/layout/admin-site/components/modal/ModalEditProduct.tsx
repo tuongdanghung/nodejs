@@ -6,11 +6,15 @@ import {
     DialogBody,
     DialogFooter,
 } from "@material-tailwind/react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../../store";
 import { Modal } from "../../../../interface/client";
 import CheckBoxComponent from "../checkbox";
 import "./index.scss";
+import { ToastContainer, toast } from "react-toastify";
 import CheckBoxImage from "../checkBoxImage";
 import { apiEditProduct, apiUpdateProductSize } from "../../../../apis";
+import { GetAllProduct } from "../../../../store/actions";
 const ModalEditProduct: React.FC<Modal> = (props) => {
     const [open, setOpen] = useState<boolean>(false);
     const [item, setItem] = useState<any>(props.item);
@@ -24,10 +28,12 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
     const [valueCapacity, setValueCapacity] = useState<object[]>([]);
     const [valueColor, setValueColor] = useState<object[]>([]);
     const [itemImage, setItemImage] = useState<any>([]);
+
     const [itemDescription, setDescription] = useState<any>("");
     const [valueImageFile, setValueImageFile] = useState<any>([]);
     const [valueImageCloud, setValueCloud] = useState<object>([]);
     const [filterProductSize, setFilterProductSize] = useState<object>([]);
+    const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
         setOpen(props.open);
         setItem(props.item);
@@ -98,11 +104,16 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
                 productSizeId: newDataProductSize,
                 productId: item.id,
             };
-            const response = await apiUpdateProductSize(updateProductSize);
-            console.log("<<<<<<", response);
+            await apiUpdateProductSize(updateProductSize);
         }
         const response = await apiEditProduct(payload, item.id);
-        console.log(">>>>>", response);
+        if (response.data.success) {
+            handleClose();
+            dispatch(GetAllProduct(null));
+            toast.success("Updated product successfully");
+        } else {
+            toast.error("Updated product failed");
+        }
     };
     const renderInputs = () => {
         return Object.keys(itemInput).map((key: any, index: any) => (
@@ -174,6 +185,7 @@ const ModalEditProduct: React.FC<Modal> = (props) => {
 
     return (
         <div>
+            <ToastContainer />
             <Dialog
                 className="modal-dialog"
                 open={open}

@@ -18,9 +18,9 @@ export const createOrderItem = async (id) => {
         const idCart = dataCartUser.map((item) => item.id);
         const response = await createOrderItemRepository(createOrder, idCart);
         return {
-            success: response > 0 ? true : false,
+            success: response.length > 0 ? true : false,
             message:
-                response > 0
+                response.length > 0
                     ? "Create order successfully"
                     : "Create order failed",
         };

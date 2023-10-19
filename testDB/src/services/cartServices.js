@@ -78,12 +78,12 @@ export const updateCart = async (id, body) => {
     }
 };
 
-export const deleteCart = ({ id }) => {
+export const deleteCart = async ({ id }) => {
     try {
-        const response = deleteCartRepository({ id });
+        const response = await deleteCartRepository({ id });
         return {
             success: response > 0 ? true : false,
-            message: `Delete role successfully`,
+            message: `Delete cart successfully`,
         };
     } catch (error) {
         return error;

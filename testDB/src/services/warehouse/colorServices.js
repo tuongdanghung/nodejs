@@ -48,7 +48,6 @@ export const getOneColor = async ({ colorId }) => {
 export const updateColor = async (colorId, body) => {
     try {
         const response = await updateColorRepository(colorId, body);
-        console.log(response);
         return {
             success: response > 0 ? true : false,
             message:

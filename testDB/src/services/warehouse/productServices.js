@@ -149,14 +149,18 @@ export const updateProduct = async (productId, body) => {
     }
 };
 
-export const deleteProduct = async ({ productId }) => {
+export const deleteProduct = async (productId, body) => {
+    const data = {
+        active: body.active,
+    };
     try {
-        const response = await deleteProductRepository({ productId });
+        const response = await updateProductRepository(productId, data);
         return {
             success: response > 0 ? true : false,
             message: `Delete successfully`,
         };
     } catch (error) {
+        console.log(error);
         return error;
     }
 };

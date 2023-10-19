@@ -1,11 +1,19 @@
 import axios from "../config/axios";
+const token = localStorage.getItem("auth");
+
+export const apiCreateOrderItem = () =>
+    axios({
+        url: "/orderItem",
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+    });
 
 export const apiCreateOrder = (data: any) =>
     axios({
         url: "/order",
         method: "POST",
         data,
-        headers: { Authorization: `Bearer ${data.token}` },
+        headers: { Authorization: `Bearer ${token}` },
     });
 
 export const apiGetAllOrder = (token: string) =>
@@ -15,17 +23,17 @@ export const apiGetAllOrder = (token: string) =>
         headers: { Authorization: `Bearer ${token}` },
     });
 
-export const apiGetOrder = (token: string) =>
+export const apiGetOrderByUser = (token: string) =>
     axios({
-        url: "/order",
+        url: "/order/history",
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
     });
 
 export const apiUpdateOrder = (data: any) =>
     axios({
-        url: `/order/status/${data.id}`,
+        url: `/order/${data.id}`,
         data: data,
         method: "PUT",
-        headers: { Authorization: `Bearer ${data.token}` },
+        headers: { Authorization: `Bearer ${token}` },
     });

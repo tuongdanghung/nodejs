@@ -73,7 +73,7 @@ const Seller = (props: any) => {
                                             className="mb-2"
                                         >
                                             <img
-                                                src={item.image[0].image}
+                                                src={item?.image[0]?.src}
                                                 alt=""
                                             />
                                         </Typography>
@@ -82,7 +82,13 @@ const Seller = (props: any) => {
                                                 {item.title}
                                             </span>{" "}
                                             <br />
-                                            <span>Price: {item.price}$</span>
+                                            <span>
+                                                Price:{" "}
+                                                {item.price.toLocaleString(
+                                                    "en-US"
+                                                )}
+                                                $
+                                            </span>
                                         </Typography>
                                     </CardBody>
                                     <CardFooter className="pt-0">

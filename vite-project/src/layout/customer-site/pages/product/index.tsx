@@ -14,10 +14,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 const Product = () => {
     const params = useParams();
-    console.log(params);
     const dispatch = useDispatch<AppDispatch>();
     const [newData, setNewData] = useState([]);
     const data = useSelector((state: any) => state?.productReducer?.products);
+
     const [products, setProducts] = useState([]);
     useEffect(() => {
         dispatch(GetAllProduct(null));
@@ -25,7 +25,9 @@ const Product = () => {
 
     useEffect(() => {
         setProducts(
-            data?.filter((product: any) => product.category === params.slug)
+            data?.filter(
+                (product: any) => product.category.title === params.slug
+            )
         );
     }, [data, params]);
 
@@ -49,7 +51,7 @@ const Product = () => {
                                         color="blue-gray"
                                         className="mb-2"
                                     >
-                                        <img src={item.image[0].image} alt="" />
+                                        <img src={item?.image[0]?.src} alt="" />
                                     </Typography>
                                     <Typography className="m-auto">
                                         <span className="text-2xl font-bold">
@@ -62,7 +64,7 @@ const Product = () => {
                                 <CardFooter className="pt-0">
                                     <Link
                                         className="border border-separate py-2 px-4 rounded-lg hover:text-white hover:bg-blue-gray-900"
-                                        to={`/${path.PRODUCTS}/${params.slug}/${item._id}`}
+                                        to={`/${path.PRODUCTS}/${params.slug}/${item.id}`}
                                     >
                                         Read More
                                     </Link>

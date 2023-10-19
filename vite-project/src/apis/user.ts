@@ -53,18 +53,43 @@ export const apiUpdateUserByAdmin = (data: any) =>
         data: data,
         headers: { Authorization: `Bearer ${data.token}` },
     });
+
+export const apiCreateCart = (data: any) =>
+    axios({
+        url: `/cart`,
+        method: "POST",
+        data: data,
+        headers: { Authorization: `Bearer ${token}` },
+    });
+
 export const apiUpdateCart = (data: any) =>
     axios({
-        url: `/users/update/cart`,
+        url: `/cart/${data.id}`,
         method: "PUT",
         data: data,
-        headers: { Authorization: `Bearer ${data.token}` },
+        headers: { Authorization: `Bearer ${token}` },
     });
+
+export const apiOrderCart = (data: any) =>
+    axios({
+        url: `/orderItem`,
+        method: "POST",
+        data: data,
+        headers: { Authorization: `Bearer ${token}` },
+    });
+
+export const apiGetCartByUser = (token: any) =>
+    axios({
+        url: `/cart/getAllCartByUser`,
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+    });
+
 export const apiDeleteCart = (data: any) =>
     axios({
-        url: `/users/delete-cart/${data.id}`,
+        url: `/cart/${data.id}`,
         method: "DELETE",
-        headers: { Authorization: `Bearer ${data.token}` },
+        headers: { Authorization: `Bearer ${token}` },
     });
 
 export const apiForgotPassword = (data: any) =>

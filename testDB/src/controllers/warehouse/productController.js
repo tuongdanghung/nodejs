@@ -58,7 +58,7 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
     try {
         const { productId } = req.params;
-        const response = await services.deleteProduct({ productId });
+        const response = await services.deleteProduct(productId, req.body);
         return res.status(200).json(response);
     } catch (error) {
         return internalServerError(res);

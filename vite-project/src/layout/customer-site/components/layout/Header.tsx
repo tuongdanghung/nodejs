@@ -27,7 +27,7 @@ import "./index.scss";
 import path from "../../utils/path";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../../store";
-import { GetOneUser } from "../../../../store/actions";
+import { GetCartByUser, GetOneUser } from "../../../../store/actions";
 
 const ProfileMenu = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -42,7 +42,7 @@ const ProfileMenu = () => {
         setIsMenuOpen(false);
     };
     useEffect(() => {
-        dispatch(GetOneUser(token));
+        dispatch(GetCartByUser(token));
     }, []);
 
     return (
@@ -173,7 +173,7 @@ const Header = () => {
             () => window.innerWidth >= 960 && setIsNavOpen(false)
         );
     }, []);
-    const oneUser = useSelector((state: any) => state?.userReducer.oneUser);
+    const cart = useSelector((state: any) => state?.userReducer.cart);
     return (
         <Navbar className="mx-auto max-w-screen-xl p-2 lg:rounded-full lg:px-6">
             <div className="relative mx-auto flex justify-between items-center text-blue-gray-900">
@@ -198,7 +198,7 @@ const Header = () => {
                 <div className="flex w-[100px] items-center cursor-pointer">
                     <Link to={path.CART} className="relative">
                         <span className="text-red-500 font-bold absolute top-[-12px] right-0">
-                            {oneUser?.cart?.length}
+                            {cart?.length}
                         </span>
                         <ShoppingCartIcon className="h-7 w-7" />
                     </Link>

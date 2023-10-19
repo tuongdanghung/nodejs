@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post("/", [verifyToken, isAdmin], controller.createOrder);
 router.get("/", [verifyToken, isAdmin], controller.getAllOrder);
+router.get("/history", [verifyToken, isAdmin], controller.getAllOrderByUser);
 router.put("/:id", [verifyToken], controller.updateOrder);
 module.exports = router;

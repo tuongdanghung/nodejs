@@ -14,11 +14,10 @@ interface DataItem {
     detail: any;
     handleClose: (open: boolean) => void;
 }
-const TABLE_HEAD = ["Title", "Image", "Quantity", "Capacity", "Ram"];
+const TABLE_HEAD = ["Title", "Image", "Quantity", "Capacity", "price"];
 const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
     const [open, setOpen] = useState(false);
     const [detail, setDetail] = useState(props.detail);
-    console.log(detail);
     useEffect(() => {
         setOpen(props.open);
         setDetail(props.detail);
@@ -26,6 +25,13 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
     const handleClose = () => {
         props.handleClose(false);
     };
+    let totalPrice = 0;
+
+    detail?.sp?.map((item: any) => {
+        const priceProduct =
+            item.productSize.product.price * item.productSize.capacity.percent;
+        totalPrice += priceProduct * item.quantity;
+    });
     return (
         <Dialog
             className="modal-dialog"
@@ -36,7 +42,7 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                 unmount: { scale: 0.9, y: -100 },
             }}
         >
-            <DialogHeader>{props.title}</DialogHeader>
+            <DialogHeader>Detail Order</DialogHeader>
             <DialogBody divider>
                 <Card className="h-full w-full rounded-none">
                     <table className="w-full min-w-max table-auto text-left">
@@ -59,9 +65,10 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {detail?.product.map((item: any, index: any) => {
-                                const isLast =
-                                    index === detail?.product.length - 1;
+                            {detail?.sp?.map((item: any, index: any) => {
+                                console.log(item.productSize);
+
+                                const isLast = index === detail?.sp?.length - 1;
                                 const classes = isLast
                                     ? "p-4"
                                     : "p-4 border-b border-blue-gray-50";
@@ -74,7 +81,7 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                                                 color="blue-gray"
                                                 className="font-normal"
                                             >
-                                                {item.title}
+                                                {item.productSize.product.title}
                                             </Typography>
                                         </td>
                                         <td className={classes}>
@@ -85,7 +92,10 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                                             >
                                                 <img
                                                     width={60}
-                                                    src={item.image}
+                                                    src={
+                                                        item.productSize.product
+                                                            .image[0].src
+                                                    }
                                                     alt=""
                                                 />
                                             </Typography>
@@ -107,7 +117,7 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                                                 color="blue-gray"
                                                 className="font-medium"
                                             >
-                                                {item.capacity.size}
+                                                {item.productSize.capacity.size}
                                             </Typography>
                                         </td>
                                         <td className={classes}>
@@ -118,7 +128,11 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                                                 color="blue-gray"
                                                 className="font-medium"
                                             >
-                                                {item.ram}
+                                                {item.productSize.capacity
+                                                    .percent *
+                                                    item.productSize.product
+                                                        .price}{" "}
+                                                $
                                             </Typography>
                                         </td>
                                     </tr>
@@ -127,6 +141,9 @@ const ModalOrderComponent: React.FC<DataItem> = (props: any) => {
                         </tbody>
                     </table>
                 </Card>
+                <p className="text-right mt-4">Total: {totalPrice} $</p>
+                <p className="text-right mt-4">Shipping: 15 $</p>
+                <p className="text-right mt-4">SubTotal: {totalPrice + 15} $</p>
             </DialogBody>
             <DialogFooter>
                 <Button

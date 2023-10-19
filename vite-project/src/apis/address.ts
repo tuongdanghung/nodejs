@@ -1,4 +1,13 @@
 import axios from "../config/axios";
+
+const token = localStorage.getItem("auth");
+export const apiGetOneAddress = (data: any) =>
+    axios({
+        url: `/address/${data}`,
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+    });
+
 export const apiGetPublicProvinces = () =>
     new Promise(async (resolve, reject) => {
         try {

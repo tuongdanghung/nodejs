@@ -76,9 +76,6 @@ const ManagerOrder: React.FC = () => {
     const handlePage = (pagination: any) => {
         setNewData(pagination);
     };
-    const totalOrder = (total: Number) => {
-        console.log(total);
-    };
     return (
         <Card className="h-full w-full">
             <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -238,7 +235,6 @@ const ManagerOrder: React.FC = () => {
                 handleClose={handleClose}
                 open={open}
                 detail={detail}
-                totalOrder={totalOrder}
             />
         </Card>
     );

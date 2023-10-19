@@ -12,9 +12,10 @@ const FeaturedBrand = (props: any) => {
     const [filterData, setFilterdata] = useState<any>([]);
     useEffect(() => {
         setFilterdata(
-            props.data?.filter((data: any) => data.brand === "Samsung")
+            props.data?.filter((data: any) => data.brand === "Tablet")
         );
     }, [props]);
+    console.log(filterData);
     return (
         <div className="mt-6 customer-care p-6 bg-white border border-collapse rounded-md">
             <div className="flex">

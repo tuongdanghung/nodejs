@@ -15,6 +15,10 @@ router.post(
 router.get("/", controller.getAllProduct);
 router.get("/:productId", [verifyToken, isAdmin], controller.getOneProduct);
 router.put("/:productId", [verifyToken, isAdmin], controller.updateProduct);
-router.delete("/:productId", [verifyToken, isAdmin], controller.deleteProduct);
+router.put(
+    "/delete/:productId",
+    [verifyToken, isAdmin],
+    controller.deleteProduct
+);
 
 module.exports = router;

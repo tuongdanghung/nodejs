@@ -18,7 +18,7 @@ const Footer = () => {
     return (
         <footer className="relative max-w-[1400px] m-auto mt-6">
             <hr />
-            {/* <div className="mx-auto w-full mt-6">
+            <div className="mx-auto w-full mt-6">
                 <div className="grid grid-cols-1 justify-between gap-4 md:grid-cols-2">
                     <Typography variant="h5" className="mb-6">
                         Material Tailwind
@@ -149,7 +149,7 @@ const Footer = () => {
                         </Typography>
                     </div>
                 </div>
-            </div> */}
+            </div>
         </footer>
     );
 };

@@ -8,7 +8,6 @@ import {
 export const createCapacity = async ({ size, percent }) => {
     try {
         const response = await createCapacityRepository({ size, percent });
-        console.log(response);
         return {
             success: response[1] === true ? true : false,
             message:

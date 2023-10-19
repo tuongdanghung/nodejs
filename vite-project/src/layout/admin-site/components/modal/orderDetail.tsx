@@ -13,7 +13,6 @@ interface DataItem {
     open: boolean;
     detail: any;
     handleClose: (open: boolean) => void;
-    totalOrder: (total: Number) => void;
 }
 const TABLE_HEAD = [
     "MDH",

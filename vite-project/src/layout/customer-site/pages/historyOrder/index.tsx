@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../../store";
-import { GetOneOrder } from "../../../../store/actions";
+import { GetAllOrderByUser } from "../../../../store/actions";
 import { Button, Card, Typography } from "@material-tailwind/react";
 import { AiFillEdit } from "react-icons/ai";
 import ModalOrderComponent from "../../components/modal";
@@ -17,20 +17,12 @@ const HistoryOrder = () => {
     const data = newData.length > 0 ? newData : order !== undefined && order;
     const [detail, setDetail] = useState(null);
     useEffect(() => {
-        dispatch(GetOneOrder(token));
+        dispatch(GetAllOrderByUser(token));
     }, []);
-    const TABLE_HEAD = [
-        "MDH",
-        "Address",
-        "Total",
-        "Shipping",
-        "Subtotal",
-        "Status",
-        "",
-    ];
+    const TABLE_HEAD = ["MDH", "Address", "Phone", "Status", ""];
     const handleOpen = (id: string) => {
         setOpen(!open);
-        const history = order?.find((item: any) => item._id === id);
+        const history = order?.find((item: any) => item.id === id);
         if (history) {
             setDetail(history);
         }
@@ -43,21 +35,12 @@ const HistoryOrder = () => {
         orderId: string
     ) => {
         const value = event.target.value;
-        const updatedData = order?.map((order: any) => {
-            if (order._id === orderId) {
-                return { ...order, status: value };
-            }
-            return order;
-        });
-
-        setNewData(updatedData);
         const response = await apiUpdateOrder({
             id: orderId,
             status: value,
-            token,
         });
         if ((response as any).data.success) {
-            dispatch(GetOneOrder(token));
+            dispatch(GetAllOrderByUser(token));
             toast.success("Updated status successfully");
         } else {
             toast.error("Updated status failed");
@@ -92,14 +75,14 @@ const HistoryOrder = () => {
                             : "p-4 border-b border-blue-gray-50";
 
                         return (
-                            <tr key={item._id}>
+                            <tr key={item.id}>
                                 <td className={classes}>
                                     <Typography
                                         variant="small"
                                         color="blue-gray"
                                         className="font-normal"
                                     >
-                                        MDH{item._id}
+                                        MDH{item.orderItemId}
                                     </Typography>
                                 </td>
                                 <td className={classes}>
@@ -108,11 +91,11 @@ const HistoryOrder = () => {
                                         color="blue-gray"
                                         className="font-normal"
                                     >
-                                        {item.address[0].province}
+                                        {item.address.province}
                                         {" - "}
-                                        {item.address[0].district}
+                                        {item.address.district}
                                         {" - "}
-                                        {item.address[0].ward}
+                                        {item.address.ward}
                                     </Typography>
                                 </td>
                                 <td className={classes}>
@@ -121,7 +104,7 @@ const HistoryOrder = () => {
                                         color="blue-gray"
                                         className="font-normal"
                                     >
-                                        {item.total}$
+                                        0{item.address.phone}
                                     </Typography>
                                 </td>
                                 <td className={classes}>
@@ -130,33 +113,15 @@ const HistoryOrder = () => {
                                         color="blue-gray"
                                         className="font-normal"
                                     >
-                                        {item.shipping}$
-                                    </Typography>
-                                </td>
-                                <td className={classes}>
-                                    <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal"
-                                    >
-                                        {item.total + item.shipping}$
-                                    </Typography>
-                                </td>
-                                <td className={classes}>
-                                    <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal"
-                                    >
-                                        {item.status === "Pending" ? (
+                                        {item.status === "pending" ? (
                                             <select
                                                 className="border border-collapse rounded-lg w-full"
                                                 value={item.status}
                                                 onChange={(e) =>
-                                                    handleChange(e, item._id)
+                                                    handleChange(e, item.id)
                                                 }
                                             >
-                                                <option value="Pending">
+                                                <option value="pending">
                                                     Pending
                                                 </option>
                                                 <option value="Cancel">
@@ -180,7 +145,7 @@ const HistoryOrder = () => {
                                     >
                                         <Button
                                             onClick={() => {
-                                                handleOpen(item._id);
+                                                handleOpen(item.id);
                                             }}
                                             className="bg-green-500 hover:bg-green-700 text-white font-bold px-6 py-3 rounded text-lg"
                                         >

@@ -7,16 +7,19 @@ import { apiUpdateUser } from "../../../../apis";
 import { ToastContainer, toast } from "react-toastify";
 const Profile = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const oneUser = useSelector((state: any) => state?.userReducer.oneUser);
-
+    const oneUser = useSelector(
+        (state: any) => state?.userReducer?.oneUser?.data
+    );
     const [userData, setUserData] = useState({
         firstName: "",
         lastName: "",
         mobile: "",
         email: "",
+        active: "",
     });
     const token = localStorage.getItem("auth");
     const [isCheck, setIsCheck] = useState(true);
+    const [avatar, setAvatar] = useState("");
     useEffect(() => {
         dispatch(GetOneUser(token));
     }, []);
@@ -26,6 +29,7 @@ const Profile = () => {
             lastName: oneUser?.lastName,
             mobile: oneUser?.mobile,
             email: oneUser?.email,
+            active: oneUser?.active,
         });
     }, [oneUser]);
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,11 +42,18 @@ const Profile = () => {
         }));
     };
     const handleUpdate = async () => {
-        const response = await apiUpdateUser(userData);
+        const newData = {
+            ...userData,
+            avatar,
+        };
+        const formData = new FormData();
+        for (let i of Object.entries(newData)) formData.append(i[0], i[1]);
+        for (let img of avatar) formData.append("avatar", img);
+        const response = await apiUpdateUser(formData);
         if (response.status === 200) {
             toast.success("User updated successfully");
             dispatch(GetOneUser(token));
-            setIsCheck(false);
+            setIsCheck(true);
         } else {
             toast.success("User updated failed");
         }
@@ -51,11 +62,16 @@ const Profile = () => {
         <div className="p-4 border border-collapse rounded-md m-0">
             <ToastContainer />
             <div className="md:flex no-wrap md:-mx-2 ">
+                <div>
+                    <div className="px-4 py-2">
+                        <img width={150} src={`${oneUser?.avatar}`} alt="" />
+                    </div>
+                </div>
                 {/* Right Side */}
                 <div className="w-full mx-2 h-full">
                     <div className="bg-white p-3 shadow-sm border border-collapse rounded-md">
                         <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
-                            <span className="tracking-wide">About</span>
+                            <span className="tracking-wide">Profile</span>
                         </div>
                         <div className="text-gray-700">
                             <div className="grid md:grid-cols-2 text-sm">
@@ -75,20 +91,21 @@ const Profile = () => {
                                         {oneUser?.lastName}
                                     </div>
                                 </div>
+
                                 <div className="grid grid-cols-2">
                                     <div className="px-4 py-2 font-semibold">
-                                        Contact No.
+                                        Email
                                     </div>
                                     <div className="px-4 py-2">
-                                        {oneUser?.mobile}
+                                        {oneUser?.email}
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2">
                                     <div className="px-4 py-2 font-semibold">
-                                        Email.
+                                        Active
                                     </div>
                                     <div className="px-4 py-2">
-                                        {oneUser?.email}
+                                        {oneUser?.active}
                                     </div>
                                 </div>
                             </div>
@@ -125,10 +142,11 @@ const Profile = () => {
                             />
                         </div>
                         <div>
-                            <label>Contact No.</label>
+                            <label>Active</label>
                             <Input
                                 type="text"
-                                value={userData?.mobile}
+                                disabled
+                                value={userData?.active}
                                 name="mobile"
                                 className="w-full"
                                 crossOrigin={undefined}
@@ -144,6 +162,17 @@ const Profile = () => {
                                 value={userData?.email}
                                 className="w-full"
                                 crossOrigin={undefined}
+                            />
+                        </div>
+                        <div>
+                            <label>Email</label>
+                            <input
+                                className="rounded-lg mt-4 border border-separate"
+                                onChange={(event: any) =>
+                                    setAvatar(event.target.files)
+                                }
+                                type="file"
+                                multiple
                             />
                         </div>
                     </div>

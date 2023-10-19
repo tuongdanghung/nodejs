@@ -17,13 +17,7 @@ import { GetAllUsersByAdmin } from "../../../../store/actions";
 import { AppDispatch } from "../../../../store";
 import { apiUpdateUserByAdmin } from "../../../../apis";
 import { ToastContainer, toast } from "react-toastify";
-const TABLE_HEAD = [
-    "Full Name",
-    "Email",
-    "Role",
-    "Active",
-    "",
-];
+const TABLE_HEAD = ["Full Name", "Email", "Role", "Active", ""];
 
 const ManagerUsers = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -35,9 +29,11 @@ const ManagerUsers = () => {
     }, []);
     const handleEdit = async (id: string) => {
         const user = users?.find((user: any) => user.id === id);
-        console.log(user)
-        const payload = { active: `${user.active === "true" ? "false" : "true"}`, id: id, token: token };
-        console.log(payload);
+        const payload = {
+            active: `${user.active === "true" ? "false" : "true"}`,
+            id: id,
+            token: token,
+        };
         const response = await apiUpdateUserByAdmin(payload);
         if ((response as any).data.success) {
             dispatch(GetAllUsersByAdmin(null));
@@ -80,8 +76,7 @@ const ManagerUsers = () => {
                             const classes = isLast
                                 ? "p-4"
                                 : "p-4 border-b border-blue-gray-50";
-                            
-                            
+
                             return (
                                 <tr key={item.id}>
                                     <td className={classes}>
@@ -115,7 +110,8 @@ const ManagerUsers = () => {
                                             color="blue-gray"
                                             className="font-normal"
                                         >
-                                            {Number(item.role.id) === 2 && "user"}
+                                            {Number(item.role.id) === 2 &&
+                                                "user"}
                                         </Typography>
                                     </td>
                                     <td className={classes}>

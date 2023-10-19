@@ -1,153 +1,121 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Typography } from "@material-tailwind/react";
-import { GetOneUser } from "../../../../store/actions";
+import { GetOneUser, GetCartByUser } from "../../../../store/actions";
 import { AppDispatch } from "../../../../store";
 import { ToastContainer, toast } from "react-toastify";
-import { apiDeleteCart, apiCreateOrder } from "../../../../apis";
+import {
+    apiDeleteCart,
+    apiCreateOrderItem,
+    apiCreateOrder,
+    apiUpdateCart,
+} from "../../../../apis";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import MapComponent from "../../components/map";
-import Distance from "../../components/distance";
+// import { io,Socket } from "socket.io-client";
+import * as io from "socket.io-client";
+const socket = io.connect("http://localhost:5000");
 const TABLE_HEAD = ["Title", "Image", "Quantity", "Total", ""];
 
-const Cart = () => {
+const Cart: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const [quantity, setQuantity] = useState<any>(0);
-    const [shipping, setShipping] = useState(0);
     const [address, setAddress] = useState("");
-    const [isCheck, setIsCheck] = useState(false);
     const token = localStorage.getItem("auth");
-    const cart = useSelector((state: any) => state?.userReducer?.oneUser?.cart);
+    const cart = useSelector((state: any) => state?.userReducer?.cart);
+    const oneUser = useSelector(
+        (state: any) => state?.userReducer?.oneUser?.data
+    );
     const data = quantity !== 0 ? quantity : cart;
     useEffect(() => {
         dispatch(GetOneUser(token));
+        dispatch(GetCartByUser(token));
     }, [quantity]);
-    const handleQuantityChange = (
+    const handleQuantityChange = async (
         event: React.ChangeEvent<HTMLInputElement>,
         productId: string
     ) => {
         const updatedProducts = cart.map((product: any) => {
-            const newQuantity =
-                parseInt(event.target.value, 10) < product.product.quantity
-                    ? parseInt(event.target.value, 10)
-                    : product.product.quantity;
-            if (product._id === productId) {
+            if (product.id === productId) {
                 // Cập nhật giá trị quantity cho sản phẩm tương ứng
                 return {
                     ...product,
-                    quantity: newQuantity,
+                    quantity: +event.target.value,
                 };
             }
+
             return product;
         });
+        const req = updatedProducts.find((item: any) => item.id === productId);
+        await apiUpdateCart({ quantity: req.quantity, id: req.id });
         setQuantity(updatedProducts);
     };
     const handleDelete = async (id: string) => {
-        const response = await apiDeleteCart({ id, token });
+        const response = await apiDeleteCart({ id });
         if (response.data.success) {
             toast.success("Delete item cart successfully");
-            dispatch(GetOneUser(token));
+            dispatch(GetCartByUser(token));
         } else {
             toast.error("Delete item cart failed");
         }
     };
+    const handleAddressId = (address: any) => {
+        setAddress(address);
+    };
     const handleCheckout = async () => {
-        if (address !== "") {
-            setIsCheck(false);
+        const responseOrderItem = await apiCreateOrderItem();
+        if (responseOrderItem.data.success) {
             const response = await apiCreateOrder({
-                token,
-                shipping: shipping * 0.5,
-                address,
+                addressId: +address,
+                paymentId: 1,
             });
             if (response.data.success) {
-                Swal.fire(
-                    "Congratulations!",
-                    "Checkout successfully",
-                    "success"
-                );
-                dispatch(GetOneUser(token));
-            } else {
-                Swal.fire("Oops!", "Checkout fail", "error");
+                Swal.fire("Congratulations!", response.data.message, "success");
+                socket.emit("send_message", "Click!");
+                dispatch(GetCartByUser(token));
+            } else Swal.fire("Oops!", response.data.message, "error");
+        }
+    };
+
+    const handleDecrease = async (productId: string) => {
+        const updatedProducts = data?.map((product: any) => {
+            if (product.id === productId) {
+                // Cập nhật giá trị quantity cho sản phẩm tương ứng
+
+                return {
+                    ...product,
+                    quantity: product.quantity - 1,
+                };
             }
-        } else {
-            setIsCheck(true);
-        }
+            return product;
+        });
+        const req = updatedProducts.find((item: any) => item.id === productId);
+        await apiUpdateCart({ quantity: req.quantity, id: req.id });
+        setQuantity(updatedProducts);
     };
-    const dataMap = (data: any) => {
-        setAddress(data);
+    const handleIncrease = async (productId: string) => {
+        const updatedProducts = data?.map((product: any) => {
+            if (product.id === productId) {
+                // Cập nhật giá trị quantity cho sản phẩm tương ứng
+
+                return {
+                    ...product,
+                    quantity: product.quantity + 1,
+                };
+            }
+            return product;
+        });
+        const req = updatedProducts.find((item: any) => item.id === productId);
+        await apiUpdateCart({ quantity: req.quantity, id: req.id });
+        setQuantity(updatedProducts);
     };
-    const distance = (data: any) => {
-        setShipping(data);
-    };
-    const handleDecrease = (productId: string) => {
-        if (quantity !== 0) {
-            const updatedProducts = quantity.map((product: any) => {
-                const newQuantity =
-                    product.quantity > 1 ? product.quantity - 1 : 1;
-                if (product._id === productId) {
-                    // Cập nhật giá trị quantity cho sản phẩm tương ứng
-                    return {
-                        ...product,
-                        quantity: newQuantity,
-                    };
-                }
-                return product;
-            });
-            setQuantity(updatedProducts);
-        } else {
-            const updatedProducts = cart.map((product: any) => {
-                const newQuantity =
-                    product.quantity > 1 ? product.quantity - 1 : 1;
-                if (product._id === productId) {
-                    console.log(product.quantity);
-                    // Cập nhật giá trị quantity cho sản phẩm tương ứng
-                    return {
-                        ...product,
-                        quantity: newQuantity,
-                    };
-                }
-                return product;
-            });
-            setQuantity(updatedProducts);
-        }
-    };
-    const handleIncrease = (productId: string) => {
-        if (quantity !== 0) {
-            const updatedProducts = quantity.map((product: any) => {
-                const newQuantity =
-                    product.quantity < product.product.quantity
-                        ? product.quantity + 1
-                        : product.product.quantity;
-                // ;
-                if (product._id === productId) {
-                    // Cập nhật giá trị quantity cho sản phẩm tương ứng
-                    return {
-                        ...product,
-                        quantity: newQuantity,
-                    };
-                }
-                return product;
-            });
-            setQuantity(updatedProducts);
-        } else {
-            const updatedProducts = cart.map((product: any) => {
-                const newQuantity =
-                    product.quantity < product.product.quantity
-                        ? product.quantity + 1
-                        : product.product.quantity;
-                if (product._id === productId) {
-                    console.log(product.quantity);
-                    // Cập nhật giá trị quantity cho sản phẩm tương ứng
-                    return {
-                        ...product,
-                        quantity: newQuantity,
-                    };
-                }
-                return product;
-            });
-            setQuantity(updatedProducts);
-        }
-    };
+    let total = 0;
+    data?.map((item: any) => {
+        console.log(item.quantity);
+        const price =
+            item.productSize.capacity.percent * item.productSize.product.price;
+        total += price * item.quantity;
+    });
     return (
         <div>
             {data?.length > 0 ? (
@@ -179,8 +147,8 @@ const Cart = () => {
                                     </thead>
                                     <tbody>
                                         {data?.map((item: any, index: any) => {
-                                            const formattedTotal =
-                                                item.totalPrice.toLocaleString();
+                                            // const formattedTotal =
+                                            //     item.totalPrice.toLocaleString();
                                             const isLast =
                                                 index === cart.length - 1;
                                             const classes = isLast
@@ -188,7 +156,7 @@ const Cart = () => {
                                                 : "p-4 border-b border-blue-gray-50";
                                             return (
                                                 <tr
-                                                    key={item._id}
+                                                    key={index}
                                                     className="m-auto"
                                                 >
                                                     <td className={classes}>
@@ -197,7 +165,12 @@ const Cart = () => {
                                                             color="blue-gray"
                                                             className="font-normal"
                                                         >
-                                                            {item.product.title}
+                                                            {
+                                                                item
+                                                                    ?.productSize
+                                                                    ?.product
+                                                                    ?.title
+                                                            }
                                                         </Typography>
                                                     </td>
                                                     <td className={classes}>
@@ -209,7 +182,7 @@ const Cart = () => {
                                                             <img
                                                                 className="m-auto"
                                                                 width={80}
-                                                                src={`${item.product.image[0]?.image}`}
+                                                                src={`${item?.productSize?.product?.image[0]?.src}`}
                                                                 alt=""
                                                             />
                                                         </Typography>
@@ -219,7 +192,7 @@ const Cart = () => {
                                                             <Button
                                                                 onClick={() =>
                                                                     handleDecrease(
-                                                                        item._id
+                                                                        item?.id
                                                                     )
                                                                 }
                                                             >
@@ -229,19 +202,19 @@ const Cart = () => {
                                                                 className="w-[100px] rounded-md mx-3"
                                                                 type="number"
                                                                 value={
-                                                                    item.quantity
+                                                                    item?.quantity
                                                                 }
                                                                 onChange={(e) =>
                                                                     handleQuantityChange(
                                                                         e,
-                                                                        item._id
+                                                                        item?.id
                                                                     )
                                                                 }
                                                             />
                                                             <Button
                                                                 onClick={() =>
                                                                     handleIncrease(
-                                                                        item._id
+                                                                        item?.id
                                                                     )
                                                                 }
                                                             >
@@ -257,7 +230,7 @@ const Cart = () => {
                                                             color="blue-gray"
                                                             className="font-medium"
                                                         >
-                                                            {formattedTotal} $
+                                                            {/* {formattedTotal} $ */}
                                                         </Typography>
                                                     </td>
                                                     <td className={classes}>
@@ -271,7 +244,7 @@ const Cart = () => {
                                                             <Button
                                                                 onClick={() =>
                                                                     handleDelete(
-                                                                        item._id
+                                                                        item.id
                                                                     )
                                                                 }
                                                                 className="bg-[#ea4335] hover:bg-[#a03329] text-xs"
@@ -287,49 +260,24 @@ const Cart = () => {
                                 </table>
                             </div>
                             <div className="grow border border-separate gap-4 p-5 ml-5">
-                                <MapComponent dataMap={dataMap} />
-                                {isCheck === true && (
-                                    <i className="mt-4 text-red-500">
-                                        You have not selected a delivery address
-                                    </i>
-                                )}
+                                <MapComponent
+                                    user={oneUser}
+                                    handleAddressId={handleAddressId}
+                                />
                             </div>
                         </div>
                     </Card>
                     <div className="mt-6 flex flex-col items-end">
                         <p className="text-2xl font-bold">
-                            Total:{" "}
-                            <span>
-                                {data
-                                    ?.reduce(
-                                        (total: any, item: any) =>
-                                            total +
-                                            item.product.price *
-                                                item.capacity.percent *
-                                                item.quantity,
-                                        0
-                                    )
-                                    .toLocaleString()}{" "}
-                                $
-                            </span>
+                            Total: <span>{total.toLocaleString()} $</span>
                         </p>
-                        <Distance address={address} distance={distance} />
+                        <p className="text-2xl my-3 font-bold">
+                            Shipping: <span>15 $</span>
+                        </p>
+                        {/* <Distance address={address} distance={distance} /> */}
                         <p className="text-2xl font-bold">
-                            Total:{" "}
-                            <span>
-                                {data
-                                    ?.reduce(
-                                        (total: any, item: any) =>
-                                            total +
-                                            item.product.price *
-                                                item.capacity.percent *
-                                                item.quantity +
-                                            shipping * 0.5,
-                                        0
-                                    )
-                                    .toLocaleString()}{" "}
-                                $
-                            </span>
+                            SubTotal:{" "}
+                            <span>{(total + 15).toLocaleString()} $</span>
                         </p>
                         <Button
                             onClick={handleCheckout}

@@ -3,6 +3,7 @@ import {
     createOrderRepository,
     getAllOrderRepository,
     updateOrderRepository,
+    getAllOrderByUserRepository,
 } from "../repositories/orderRepository";
 export const createOrder = async (id, body) => {
     try {
@@ -31,6 +32,18 @@ export const createOrder = async (id, body) => {
 export const getAllOrder = async () => {
     try {
         const response = await getAllOrderRepository();
+        return {
+            success: true,
+            data: response,
+        };
+    } catch (error) {
+        return error;
+    }
+};
+
+export const getAllOrderByUser = async ({ id }) => {
+    try {
+        const response = await getAllOrderByUserRepository({ id });
         return {
             success: true,
             data: response,

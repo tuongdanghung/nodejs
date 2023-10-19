@@ -11,6 +11,16 @@ export const createOrder = async (req, res) => {
     }
 };
 
+export const getAllOrderByUser = async (req, res) => {
+    try {
+        const { id } = req.user;
+        const response = await services.getAllOrderByUser({ id });
+        return res.status(200).json(response);
+    } catch (error) {
+        return internalServerError(res);
+    }
+};
+
 export const getAllOrder = async (req, res) => {
     try {
         const response = await services.getAllOrder();

@@ -13,7 +13,6 @@ export const createOrderRepository = async (body) => {
             userId: body.userId,
         },
     });
-    console.log(data);
     return data;
 };
 
@@ -24,7 +23,7 @@ export const getAllOrderRepository = async () => {
                 model: db.User,
                 as: "user",
                 attributes: {
-                    exclude: ["createdAt", "updatedAt"],
+                    exclude: ["createdAt", "updatedAt", "password"],
                 },
             },
             {
@@ -133,6 +132,139 @@ export const getAllOrderRepository = async () => {
                 "addressId",
             ],
         },
+    });
+    return data;
+};
+
+// export const getAllOrderByUserRepository = async (id) => {
+//     console.log(id);
+//     const data = await db.Order.findAll({
+//         where: { userId: id },
+
+//         attributes: {
+//             exclude: [
+//                 "createdAt",
+//                 "updatedAt",
+//                 "AddressId",
+//                 "paymentId",
+//                 // "userId",
+//                 "addressId",
+//             ],
+//         },
+//     });
+//     console.log(data);
+//     return data;
+// };
+export const getAllOrderByUserRepository = async ({ id }) => {
+    const data = await db.Order.findAll({
+        where: { userId: id },
+        attributes: {
+            exclude: ["createdAt", "updatedAt"],
+        },
+        include: [
+            {
+                model: db.User,
+                as: "user",
+                attributes: {
+                    exclude: ["createdAt", "updatedAt"],
+                },
+            },
+            {
+                model: db.Address,
+                as: "address",
+                attributes: {
+                    exclude: ["createdAt", "updatedAt"],
+                },
+            },
+            {
+                model: db.Payment,
+                as: "payment",
+                attributes: {
+                    exclude: ["createdAt", "updatedAt"],
+                },
+            },
+            {
+                model: db.OrderItem,
+                as: "sp",
+                include: [
+                    {
+                        model: db.ProductSize,
+                        as: "productSize",
+                        attributes: {
+                            exclude: [
+                                "createdAt",
+                                "updatedAt",
+                                "productId",
+                                "colorId",
+                                "capacityId",
+                            ],
+                        },
+                        include: [
+                            {
+                                model: db.Product,
+                                as: "product",
+                                attributes: {
+                                    exclude: [
+                                        "createdAt",
+                                        "updatedAt",
+                                        "brandId",
+                                        "categoryId",
+                                    ],
+                                },
+                                include: [
+                                    {
+                                        model: db.Category,
+                                        as: "category",
+                                        attributes: {
+                                            exclude: ["createdAt", "updatedAt"],
+                                        },
+                                    },
+                                    {
+                                        model: db.Brand,
+                                        as: "brand",
+                                        attributes: {
+                                            exclude: ["createdAt", "updatedAt"],
+                                        },
+                                    },
+                                    {
+                                        model: db.Image,
+                                        as: "image",
+                                        attributes: {
+                                            exclude: ["createdAt", "updatedAt"],
+                                        },
+                                    },
+                                ],
+                            },
+                            {
+                                model: db.Capacity,
+                                as: "capacity",
+                                attributes: {
+                                    exclude: ["createdAt", "updatedAt"],
+                                },
+                            },
+                            {
+                                model: db.Color,
+                                as: "color",
+                                attributes: {
+                                    exclude: ["createdAt", "updatedAt"],
+                                },
+                            },
+                        ],
+                    },
+                ],
+                attributes: {
+                    exclude: [
+                        "createdAt",
+                        "updatedAt",
+                        "AddressId",
+                        "paymentId",
+                        "userId",
+                        "addressId",
+                        "productSizeId",
+                    ],
+                },
+            },
+        ],
     });
     return data;
 };

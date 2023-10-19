@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
             categoryId: DataTypes.INTEGER,
             price: DataTypes.INTEGER,
             stock: DataTypes.INTEGER,
+            active: DataTypes.INTEGER,
         },
         {
             sequelize,

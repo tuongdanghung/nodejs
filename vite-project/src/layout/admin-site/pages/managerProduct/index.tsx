@@ -25,7 +25,15 @@ import { ToastContainer, toast } from "react-toastify";
 import ModalEditProduct from "../../components/modal/ModalEditProduct";
 import Snipper from "../../components/snipper";
 
-const TABLE_HEAD = ["Title", "Price", "Stock", "Category", "Brand", ""];
+const TABLE_HEAD = [
+    "Title",
+    "Price",
+    "Stock",
+    "Category",
+    "Brand",
+    "active",
+    "",
+];
 const ManagerProduct = () => {
     const [open, setOpen] = useState<boolean>(false);
     const [filterProductSize, setFilterProductSize] = useState<any>([]);
@@ -60,7 +68,7 @@ const ManagerProduct = () => {
     }, [item]);
 
     const handleDelete = async (id: string) => {
-        const payload = { id: id, token: token };
+        const payload = { id: id, token: token, active: 2 };
         const response = await apiDeleteProduct(payload);
         if (response.data.success) {
             dispatch(GetAllProduct(null));
@@ -134,10 +142,13 @@ const ManagerProduct = () => {
                                     <td className={classes}>
                                         {item.brand.title}
                                     </td>
+                                    <td className={classes}>
+                                        {item.active === 1 ? " true" : "false"}
+                                    </td>
                                     <td className={`${classes}`}>
                                         <Button
                                             onClick={() =>
-                                                handleDelete(item._id)
+                                                handleDelete(item.id)
                                             }
                                             className="bg-red-500  hover:bg-red-700 text-white font-bold px-6 py-3 rounded text-lg mr-2"
                                         >

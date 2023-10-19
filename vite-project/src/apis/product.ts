@@ -25,8 +25,9 @@ export const apiProductDetail = (detail: any) =>
 
 export const apiDeleteProduct = (data: any) =>
     axios({
-        url: `/product/${data.id}`,
-        method: "DELETE",
+        url: `/product/delete/${data.id}`,
+        method: "PUT",
+        data: data,
         headers: { Authorization: `Bearer ${token}` },
     });
 
