@@ -8,8 +8,11 @@ import {
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import ResetPassword from "./fogot";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+    const token = localStorage.getItem("auth");
     const data = [
         {
             label: "Sign in",
@@ -27,6 +30,10 @@ const Login = () => {
             desc: <ResetPassword />,
         },
     ];
+    const navigate = useNavigate();
+    useEffect(() => {
+        token !== null && navigate("/");
+    }, []);
 
     return (
         <div className=" h-screen flex">

@@ -94,7 +94,7 @@ const Seller = (props: any) => {
                                     <CardFooter className="pt-0">
                                         <Link
                                             className="border border-separate py-2 px-4 rounded-lg hover:text-white hover:bg-blue-gray-900"
-                                            to={`/${path.PRODUCTS}/${item.category}/${item._id}`}
+                                            to={`/${path.PRODUCTS}/${item.category}/${item.id}`}
                                         >
                                             Read More
                                         </Link>

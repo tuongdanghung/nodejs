@@ -14,10 +14,12 @@ import Swal from "sweetalert2";
 import MapComponent from "../../components/map";
 // import { io,Socket } from "socket.io-client";
 import * as io from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 const socket = io.connect("http://localhost:5000");
 const TABLE_HEAD = ["Title", "Image", "Quantity", "Total", ""];
 
 const Cart: React.FC = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const [quantity, setQuantity] = useState<any>(0);
     const [address, setAddress] = useState("");
@@ -30,6 +32,7 @@ const Cart: React.FC = () => {
     useEffect(() => {
         dispatch(GetOneUser(token));
         dispatch(GetCartByUser(token));
+        token === null && navigate("/login");
     }, [quantity]);
     const handleQuantityChange = async (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -40,7 +43,10 @@ const Cart: React.FC = () => {
                 // Cập nhật giá trị quantity cho sản phẩm tương ứng
                 return {
                     ...product,
-                    quantity: +event.target.value,
+                    quantity:
+                        +event.target.value > product.productSize.product.stock
+                            ? product.productSize.product.stock
+                            : +event.target.value,
                 };
             }
 
@@ -80,11 +86,9 @@ const Cart: React.FC = () => {
     const handleDecrease = async (productId: string) => {
         const updatedProducts = data?.map((product: any) => {
             if (product.id === productId) {
-                // Cập nhật giá trị quantity cho sản phẩm tương ứng
-
                 return {
                     ...product,
-                    quantity: product.quantity - 1,
+                    quantity: product.quantity > 1 ? product.quantity - 1 : 1,
                 };
             }
             return product;
@@ -96,11 +100,12 @@ const Cart: React.FC = () => {
     const handleIncrease = async (productId: string) => {
         const updatedProducts = data?.map((product: any) => {
             if (product.id === productId) {
-                // Cập nhật giá trị quantity cho sản phẩm tương ứng
-
                 return {
                     ...product,
-                    quantity: product.quantity + 1,
+                    quantity:
+                        product.quantity > product.productSize.product.stock
+                            ? product.productSize.product.stock
+                            : product.quantity + 1,
                 };
             }
             return product;
@@ -111,7 +116,6 @@ const Cart: React.FC = () => {
     };
     let total = 0;
     data?.map((item: any) => {
-        console.log(item.quantity);
         const price =
             item.productSize.capacity.percent * item.productSize.product.price;
         total += price * item.quantity;
@@ -259,7 +263,7 @@ const Cart: React.FC = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="grow border border-separate gap-4 p-5 ml-5">
+                            <div className="grow border border-separate gap-4 p-5 ml-5 w-[400px]">
                                 <MapComponent
                                     user={oneUser}
                                     handleAddressId={handleAddressId}

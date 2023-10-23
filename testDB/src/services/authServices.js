@@ -85,7 +85,7 @@ export const login = async ({ email, password }) => {
             : null;
 
         return {
-            success: response ? true : false,
+            success: token !== null ? true : false,
             data: token ? response : "Login failed",
             access_token: token,
         };

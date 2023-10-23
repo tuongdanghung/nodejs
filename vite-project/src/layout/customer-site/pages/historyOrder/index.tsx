@@ -7,6 +7,7 @@ import { AiFillEdit } from "react-icons/ai";
 import ModalOrderComponent from "../../components/modal";
 import { apiUpdateOrder } from "../../../../apis";
 import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const HistoryOrder = () => {
     const token = localStorage.getItem("auth");
@@ -16,8 +17,10 @@ const HistoryOrder = () => {
     const [newData, setNewData] = useState<any>([]);
     const data = newData.length > 0 ? newData : order !== undefined && order;
     const [detail, setDetail] = useState(null);
+    const navigate = useNavigate();
     useEffect(() => {
         dispatch(GetAllOrderByUser(token));
+        token === null && navigate("/login");
     }, []);
     const TABLE_HEAD = ["MDH", "Address", "Phone", "Status", ""];
     const handleOpen = (id: string) => {

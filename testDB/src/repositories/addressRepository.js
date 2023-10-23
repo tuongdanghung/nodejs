@@ -56,9 +56,11 @@ export const getOneAddressRepository = async ({ id }) => {
 };
 
 export const updateAddressRepository = async (id, body) => {
+    console.log(id, body);
     const data = await db.Address.update(body, {
         where: { id },
     });
+    console.log(data);
     return data;
 };
 

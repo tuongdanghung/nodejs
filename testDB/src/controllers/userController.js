@@ -1,5 +1,6 @@
 import * as services from "../services";
 import { internalServerError } from "../middlewares/handleErrors";
+
 export const getAllUser = async (req, res) => {
     try {
         const response = await services.getAllUser();
@@ -32,10 +33,28 @@ export const updateUser = async (req, res) => {
         return internalServerError(res);
     }
 };
+
 export const updateByAdmin = async (req, res) => {
     try {
         const { id } = req.params;
         const response = await services.updateByAdmin(id, req.body);
+        return res.status(200).json(response);
+    } catch (error) {
+        return internalServerError(res);
+    }
+};
+
+export const forgotPassword = async (req, res) => {
+    try {
+        const response = await services.forgotPasswordServices(req.body);
+        return res.status(200).json(response);
+    } catch (error) {
+        return internalServerError(res);
+    }
+};
+export const resetPassword = async (req, res) => {
+    try {
+        const response = await services.resetPasswordServices(req.body);
         return res.status(200).json(response);
     } catch (error) {
         return internalServerError(res);

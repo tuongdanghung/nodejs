@@ -9,33 +9,27 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import * as io from "socket.io-client";
 import pathAdmin from "./../../utils/path";
+import { ToastContainer, toast } from "react-toastify";
 const socket = io.connect("http://localhost:5000");
 
 const ExtendAdmin: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-    const [renderMessage, setRenderMessage] = useState<any>("");
     const token = localStorage.getItem("auth");
     const user = useSelector((state: any) => state?.userReducer?.oneUser?.data);
     useEffect(() => {
         dispatch(GetOneUser(token));
         socket.on("receive_message", (data) => {
-            setRenderMessage(data);
-            addNotification({
-                title: "Have a new order",
-                subtitle: "This is a subtitle",
-                message: "This is a very long message",
-                theme: "darkblue",
-                native: true,
+            toast.success(" Have a new order", {
                 onClick: () => {
-                    navigate(pathAdmin.MANAGER_PRODUCT);
+                    navigate(pathAdmin.MANAGER_ORDER);
                 },
             });
         });
     }, []);
-    console.log(renderMessage);
 
     const checkRole = user?.roleId;
+
     return (
         <>
             {checkRole === 1 ? (
@@ -51,6 +45,7 @@ const ExtendAdmin: React.FC = () => {
             ) : (
                 navigate("/")
             )}
+            <ToastContainer />
         </>
     );
 };

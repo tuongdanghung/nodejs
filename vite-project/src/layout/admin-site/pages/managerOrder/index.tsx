@@ -17,15 +17,7 @@ import { apiUpdateOrder } from "../../../../apis";
 import { ToastContainer, toast } from "react-toastify";
 import ModalOrderComponent from "../../components/modal/orderDetail";
 
-const TABLE_HEAD = [
-    "Code Orders",
-    "Address",
-    "Total",
-    "Shipping",
-    "Sub Total",
-    "Status",
-    "",
-];
+const TABLE_HEAD = ["Code Orders", "Address", "Status", ""];
 
 const ManagerOrder: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -142,39 +134,6 @@ const ManagerOrder: React.FC = () => {
                                                 color="blue-gray"
                                                 className="font-bold"
                                             >
-                                                {item.total} $
-                                            </Typography>
-                                        </div>
-                                    </td>
-                                    <td className={classes}>
-                                        <div className="flex items-center justify-center gap-3">
-                                            <Typography
-                                                variant="small"
-                                                color="blue-gray"
-                                                className="font-bold"
-                                            >
-                                                {item.shipping} $
-                                            </Typography>
-                                        </div>
-                                    </td>
-                                    <td className={classes}>
-                                        <div className="flex items-center justify-center gap-3">
-                                            <Typography
-                                                variant="small"
-                                                color="blue-gray"
-                                                className="font-bold"
-                                            >
-                                                {item.shipping + item.total} $
-                                            </Typography>
-                                        </div>
-                                    </td>
-                                    <td className={classes}>
-                                        <div className="flex items-center justify-center gap-3">
-                                            <Typography
-                                                variant="small"
-                                                color="blue-gray"
-                                                className="font-bold"
-                                            >
                                                 <select
                                                     className="border border-collapse rounded-lg w-full"
                                                     value={item.status}
@@ -194,7 +153,7 @@ const ManagerOrder: React.FC = () => {
                                                     <option value="done">
                                                         Done
                                                     </option>
-                                                    <option value="cancel">
+                                                    <option value="Cancel">
                                                         Cancel
                                                     </option>
                                                 </select>

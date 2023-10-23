@@ -17,7 +17,7 @@ import { GetAllUsersByAdmin } from "../../../../store/actions";
 import { AppDispatch } from "../../../../store";
 import { apiUpdateUserByAdmin } from "../../../../apis";
 import { ToastContainer, toast } from "react-toastify";
-const TABLE_HEAD = ["Full Name", "Email", "Role", "Active", ""];
+const TABLE_HEAD = ["avatar", "Full Name", "Email", "Role", "Active", ""];
 
 const ManagerUsers = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -82,18 +82,27 @@ const ManagerUsers = () => {
                                     <td className={classes}>
                                         <div className="flex items-center gap-3">
                                             <Avatar
-                                                alt={item.name}
+                                                alt={item.avatar}
+                                                src={item.avatar}
                                                 size="md"
                                                 className="border border-blue-gray-50 bg-blue-gray-50/50 object-contain p-1"
                                             />
+                                        </div>
+                                    </td>
+                                    <td className={classes}>
+                                        <Typography
+                                            variant="small"
+                                            color="blue-gray"
+                                            className="font-normal"
+                                        >
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-bold"
+                                                className="font-normal"
                                             >
-                                                {item.name}
+                                                {item.firstName} {item.lastName}
                                             </Typography>
-                                        </div>
+                                        </Typography>
                                     </td>
                                     <td className={classes}>
                                         <Typography

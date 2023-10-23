@@ -51,7 +51,18 @@ export const getOneUserRepository = async ({ id }) => {
     return data;
 };
 
+export const getOneUserForgotRepository = async ({ email }) => {
+    const data = await db.User.findOne({
+        where: { email },
+        attributes: {
+            exclude: ["password", "createdAt", "updatedAt", "role"],
+        },
+    });
+    return data;
+};
+
 export const updateUserRepository = async (id, body) => {
+    console.log(id, body);
     const data = await db.User.update(body, {
         where: { id },
     });

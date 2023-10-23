@@ -5,8 +5,8 @@ import verifyToken from "../../middlewares/verify_token";
 const router = express.Router();
 
 router.post("/", [verifyToken, isAdmin], controller.createBrand);
-router.get("/", [verifyToken, isAdmin], controller.getAllBrand);
-router.get("/:brandId", [verifyToken, isAdmin], controller.getOneBrand);
+router.get("/", [verifyToken], controller.getAllBrand);
+router.get("/:brandId", [verifyToken], controller.getOneBrand);
 router.put("/:brandId", [verifyToken, isAdmin], controller.updateBrand);
 router.delete("/:brandId", [verifyToken, isAdmin], controller.deleteBrand);
 

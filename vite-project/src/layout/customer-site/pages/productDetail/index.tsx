@@ -6,11 +6,10 @@ import {
     GetAllProductSize,
     GetCartByUser,
 } from "../../../../store/actions";
-import { Button, Rating, Textarea } from "@material-tailwind/react";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../../store";
-import { apiCreateCart, apiCreateComment } from "../../../../apis";
+import { apiCreateCart } from "../../../../apis";
 import { ToastContainer, toast } from "react-toastify";
 const ProductDetail = () => {
     const params = useParams();
@@ -18,7 +17,6 @@ const ProductDetail = () => {
     const [quantity, setQuantity] = useState(1);
     const detail = useSelector((state: any) => state?.productReducer.detail);
     const oneUser = useSelector((state: any) => state?.userReducer.oneUser);
-    const order = useSelector((state: any) => state?.orderReducer);
     const productSize = useSelector(
         (state: any) => state?.productReducer.productSize
     );
@@ -27,9 +25,6 @@ const ProductDetail = () => {
     const token = localStorage.getItem("auth");
     const [activeCapacity, setActiveCapacity] = useState(0);
     const [activeColor, setActiveColor] = useState(0);
-    // const [checkComment, setCheckComment] = useState(false);
-    // const [valueComment, setValueComment] = useState("");
-    const [isId, setIsId] = useState<string | null>(null);
 
     const handleButtonCapacity = (index: any) => {
         setActiveCapacity(index);
@@ -37,19 +32,10 @@ const ProductDetail = () => {
     };
     const handleButtonColor = (index: any) => {
         setActiveColor(index);
-        // setColor(detail?.color[index]);
     };
-    // const dataColor =
-    //     color && !Array.isArray(color)
-    //         ? color
-    //         : detail.color !== undefined && detail?.color[0];
     useEffect(() => {
-        // setCapacity(detail?.capacity);
-        // setColor(detail?.color);
         dispatch(GetProductDetail({ id: params.id, token }));
         dispatch(GetOneUser(token));
-        // dispatch(GetOneOrder(token));
-        // dispatch(GetOneOrder(token));
         dispatch(GetAllProductSize(null));
     }, []);
     useEffect(() => {
@@ -68,31 +54,6 @@ const ProductDetail = () => {
                       detail?.productSize?.color[0]
         );
     }, [detail]);
-
-    // useEffect(() => {
-    //     const checkOrder = order?.orderByUser?.find(
-    //         (item: any) => item.orderBy === oneUser?.id
-    //     );
-    //     // check mua hay chua
-    //     if (checkOrder) {
-    //         // check xem da mua sp nao
-    //         const isIdExists = order?.orderByUser?.some((order: any) =>
-    //             order.product.some(
-    //                 (product: any) => product.product === detail.id
-    //             )
-    //         );
-    //         if (isIdExists) {
-    //             // check comment hay chua
-    //             const checkComment = detail?.rating?.find(
-    //                 (item: any) => item.user === oneUser?.id
-    //             );
-    //             if (!checkComment) {
-    //                 setCheckComment(true);
-    //             }
-    //         }
-    //     }
-    // }, [oneUser, order, detail]);
-
     const handleAddToCart = async (id: any) => {
         const productSizeId = productSize?.filter(
             (item: any) =>
@@ -100,6 +61,7 @@ const ProductDetail = () => {
                 item.colorId === color.id &&
                 item.productId === id
         );
+        console.log(productSizeId);
         const response = await apiCreateCart({
             productSizeId: productSizeId[0].id,
             quantity,
@@ -108,76 +70,9 @@ const ProductDetail = () => {
             toast.success("Add to cart successfully");
             dispatch(GetCartByUser(token));
         } else {
-            toast.error("Add to cart failed");
+            toast.warning("Products already in the cart");
         }
     };
-    // const handleEdit = (id: string) => {
-    //     setIsId(id);
-    //     setCheckComment(true);
-    //     const detailComment = detail?.rating?.find(
-    //         (item: any) => item.id === id
-    //     );
-    //     if (detailComment) {
-    //         setValueComment(detailComment.comment);
-    //     }
-    // };
-
-    // const handleRatingChange = async (newValue: any, index: any) => {
-    //     const check = detail?.rating?.find(
-    //         (item: any) => item.user === oneUser?.id
-    //     );
-    //     if (check) {
-    //         const updatedItems = [...detail?.rating];
-    //         updatedItems[newValue] = { star: index };
-    //         const response = await apiCreateComment({
-    //             ...updatedItems[newValue],
-    //             token,
-    //             userId: oneUser?.id,
-    //             product: detail?.id,
-    //         });
-    //         if (response.status === 200) {
-    //             toast.success("Update star successfully");
-    //         } else {
-    //             toast.error("Update star failed");
-    //         }
-    //     }
-    // };
-    // const handleComment = async () => {
-    //     if (isId !== null) {
-    //         const response = await apiCreateComment({
-    //             comment: valueComment,
-    //             token,
-    //             userId: oneUser?.id,
-    //             product: detail?.id,
-    //         });
-    //         if (response.status === 200) {
-    //             setCheckComment(true);
-    //             setValueComment("");
-    //             setIsId(null);
-    //             dispatch(GetProductDetail({ id: params.id, token }));
-    //             toast.success("Update comment successfully");
-    //         } else {
-    //             toast.error("Update comment failed");
-    //         }
-    //     } else {
-    //         const response = await apiCreateComment({
-    //             comment: valueComment,
-    //             token,
-    //             star,
-    //             userId: oneUser?.id,
-    //             product: detail?.id,
-    //         });
-    //         if (response.status === 200) {
-    //             setCheckComment(false);
-    //             setValueComment("");
-    //             setIsId(null);
-    //             dispatch(GetProductDetail({ id: params.id, token }));
-    //             toast.success("Create comment successfully");
-    //         } else {
-    //             toast.error("Create comment failed");
-    //         }
-    //     }
-    // };
     const formattedNumber = (
         detail?.price * capacity?.percent
     ).toLocaleString();
@@ -267,7 +162,11 @@ const ProductDetail = () => {
                             <div className="mt-2 flex">
                                 <span className="w-[100px] block">Enter</span>
                                 <button
-                                    onClick={() => setQuantity(quantity - 1)}
+                                    onClick={() =>
+                                        setQuantity(
+                                            quantity > 0 ? quantity - 1 : 1
+                                        )
+                                    }
                                     className="border h-[30px] border-collapse py-1 px-3 ml-2"
                                 >
                                     -
@@ -277,11 +176,23 @@ const ProductDetail = () => {
                                     type="number"
                                     value={quantity ? quantity : 1}
                                     onChange={(e) =>
-                                        setQuantity(Number(e.target.value))
+                                        setQuantity(
+                                            Number(
+                                                e.target.value > detail.stock
+                                                    ? detail.stock
+                                                    : e.target.value
+                                            )
+                                        )
                                     }
                                 />
                                 <button
-                                    onClick={() => setQuantity(quantity + 1)}
+                                    onClick={() =>
+                                        setQuantity(
+                                            quantity < detail.stock
+                                                ? quantity + 1
+                                                : detail.stock
+                                        )
+                                    }
                                     className="border h-[30px] border-collapse py-1 px-3 ml-2"
                                 >
                                     +
@@ -292,20 +203,24 @@ const ProductDetail = () => {
                         )}
                         {token !== null ? (
                             <div>
-                                {oneUser?.isBlocked === true ? (
+                                {oneUser?.data?.active === "false" ? (
                                     <i className="text-red-500">
                                         Your account is so bad that you can't
                                         buy the product
                                     </i>
                                 ) : (
-                                    <button
-                                        onClick={() =>
-                                            handleAddToCart(detail.id)
-                                        }
-                                        className=" bg-red-500 hover:bg-red-600 text-white border border-collapse mt-6 px-3 py-2 w-full"
-                                    >
-                                        Add to cart
-                                    </button>
+                                    <div>
+                                        {detail.stock > 0 ? (
+                                            <button
+                                                onClick={() =>
+                                                    handleAddToCart(detail.id)
+                                                }
+                                                className=" bg-red-500 hover:bg-red-600 text-white border border-collapse mt-6 px-3 py-2 w-full"
+                                            >
+                                                Add to cart
+                                            </button>
+                                        ) : null}
+                                    </div>
                                 )}
                             </div>
                         ) : (
@@ -328,86 +243,6 @@ const ProductDetail = () => {
                     <p>{detail.description}</p>
                 </div>
             </div>
-            {/* <div className="p-4 border border-collapse rounded-md mt-6">
-                {checkComment === true ? (
-                    <div className="row">
-                        <Rating
-                            value={star}
-                            onChange={(newValue) => setStar(newValue)}
-                        />
-                        <div className="col">
-                            <Textarea
-                                label="Message"
-                                value={valueComment}
-                                onChange={(e) =>
-                                    setValueComment(e.target.value)
-                                }
-                            />
-                        </div>
-                        <div className="col mt-3">
-                            <Button onClick={handleComment}>Comment</Button>
-                        </div>
-                    </div>
-                ) : null}
-                <div className="comment mt-8">
-                    <h1>Comment</h1>
-                    <div className="mt-5">
-                        {detail?.rating?.length > 0 &&
-                            detail?.rating?.map((item: any, index: number) => {
-                                return (
-                                    <div key={item.id}>
-                                        <div className="my-3">
-                                            <p className="flex">
-                                                <span className="mr-3">
-                                                    {item.user ===
-                                                    oneUser?.id ? (
-                                                        <span>
-                                                            {oneUser.firstName}{" "}
-                                                            {oneUser.lastName} :
-                                                        </span>
-                                                    ) : null}
-                                                </span>
-                                                <Rating
-                                                    value={item.star}
-                                                    readonly={
-                                                        item.user ===
-                                                        oneUser?.id
-                                                            ? false
-                                                            : true
-                                                    }
-                                                    onChange={(newValue) =>
-                                                        handleRatingChange(
-                                                            index,
-                                                            newValue
-                                                        )
-                                                    }
-                                                />
-                                            </p>
-                                            <p className="mt-2 text-sm">
-                                                {item.comment}
-                                            </p>
-                                            {item.user === oneUser?.id ? (
-                                                <div className="mt-4">
-                                                    <Button
-                                                        onClick={() =>
-                                                            handleEdit(item.id)
-                                                        }
-                                                    >
-                                                        edit
-                                                    </Button>
-                                                    <Button className="ml-3">
-                                                        delete
-                                                    </Button>
-                                                </div>
-                                            ) : null}
-                                        </div>
-                                        <hr />
-                                    </div>
-                                );
-                            })}
-                    </div>
-                </div>
-            </div> */}
             <ToastContainer />
         </div>
     );

@@ -422,7 +422,11 @@ const ModalCreateComponent: React.FC<ModalCreate> = (props) => {
                                         type="number"
                                         value={quantity}
                                         onChange={(e) =>
-                                            setQuantity(Number(e.target.value))
+                                            setQuantity(
+                                                Number(e.target.value) > 3000
+                                                    ? 3000
+                                                    : Number(e.target.value)
+                                            )
                                         }
                                     />
                                     <Required

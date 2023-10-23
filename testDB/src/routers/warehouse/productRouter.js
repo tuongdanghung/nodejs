@@ -13,7 +13,7 @@ router.post(
     controller.createProduct
 );
 router.get("/", controller.getAllProduct);
-router.get("/:productId", [verifyToken, isAdmin], controller.getOneProduct);
+router.get("/:productId", controller.getOneProduct);
 router.put("/:productId", [verifyToken, isAdmin], controller.updateProduct);
 router.put(
     "/delete/:productId",

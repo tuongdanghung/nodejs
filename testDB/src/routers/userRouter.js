@@ -20,4 +20,8 @@ router.put(
     controller.updateByAdmin
 );
 
+router.post("/forgotpassword", controller.forgotPassword);
+
+router.post("/resetpassword", controller.resetPassword);
+
 module.exports = router;

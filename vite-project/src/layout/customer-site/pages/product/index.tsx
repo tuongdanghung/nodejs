@@ -26,7 +26,9 @@ const Product = () => {
     useEffect(() => {
         setProducts(
             data?.filter(
-                (product: any) => product.category.title === params.slug
+                (product: any) =>
+                    product.category.title === params.slug &&
+                    product.active === 1
             )
         );
     }, [data, params]);
@@ -41,35 +43,45 @@ const Product = () => {
                 <div className="grid grid-cols-4 gap-5">
                     {newData?.map((item: any, index: any) => {
                         return (
-                            <Card
-                                key={index}
-                                className="mt-6 border border-collapse"
-                            >
-                                <CardBody>
-                                    <Typography
-                                        variant="h6"
-                                        color="blue-gray"
-                                        className="mb-2"
-                                    >
-                                        <img src={item?.image[0]?.src} alt="" />
-                                    </Typography>
-                                    <Typography className="m-auto">
-                                        <span className="text-2xl font-bold">
-                                            {item.title}
-                                        </span>{" "}
-                                        <br />
-                                        <span>Price: {item.price}$</span>
-                                    </Typography>
-                                </CardBody>
-                                <CardFooter className="pt-0">
-                                    <Link
-                                        className="border border-separate py-2 px-4 rounded-lg hover:text-white hover:bg-blue-gray-900"
-                                        to={`/${path.PRODUCTS}/${params.slug}/${item.id}`}
-                                    >
-                                        Read More
-                                    </Link>
-                                </CardFooter>
-                            </Card>
+                            <div>
+                                <Card
+                                    key={index}
+                                    className="mt-6 border border-collapse"
+                                >
+                                    <CardBody>
+                                        <Typography
+                                            variant="h6"
+                                            color="blue-gray"
+                                            className="mb-2"
+                                        >
+                                            <img
+                                                src={item?.image[0]?.src}
+                                                alt=""
+                                            />
+                                        </Typography>
+                                        <Typography className="m-auto">
+                                            <span className="text-2xl font-bold">
+                                                {item.title}
+                                            </span>{" "}
+                                            <br />
+                                            <span>
+                                                {" "}
+                                                Stock: {item.stock} pcs
+                                            </span>{" "}
+                                            <br />
+                                            <span>Price: {item.price}$</span>
+                                        </Typography>
+                                    </CardBody>
+                                    <CardFooter className="pt-0">
+                                        <Link
+                                            className="border border-separate py-2 px-4 rounded-lg hover:text-white hover:bg-blue-gray-900"
+                                            to={`/${path.PRODUCTS}/${params.slug}/${item.id}`}
+                                        >
+                                            Read More
+                                        </Link>
+                                    </CardFooter>
+                                </Card>
+                            </div>
                         );
                     })}
                 </div>

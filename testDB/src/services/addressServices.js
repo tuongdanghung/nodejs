@@ -18,7 +18,7 @@ export const createAddress = async ({
             district,
             ward,
             userId,
-            phone,
+            phone: +phone,
         });
         return {
             success: response[1] ? true : false,
@@ -63,7 +63,7 @@ export const getOneAddress = async ({ id }) => {
 
 export const updateAddress = async (id, body) => {
     try {
-        const response = await updateAddressRepository(id, body);
+        const response = await updateAddressRepository(id, body.addressData);
         return {
             success: response > 0 ? true : false,
             message:
